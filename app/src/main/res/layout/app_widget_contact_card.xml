@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <RelativeLayout
+        android:id="@+id/widget_card_click_star"
+        android:clickable="true"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/checkImageView"
+            style="@style/GridImage"
+            android:contentDescription="@string/contact_selected"
+            android:src="@drawable/avatar_selected"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/contact_picture"
+            android:contentDescription="@string/contact_picture"
+            android:src="@drawable/avatar_empty"
+            android:layout_below="@id/widget_card_time"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter" />
+
+        <TextView
+            android:textIsSelectable="false"
+            android:id="@+id/contact_name"
+            android:textSize="12sp"
+            android:textColor="@color/accent"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+
+    </RelativeLayout>
+
+
+
+</LinearLayout>
