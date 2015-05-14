@@ -79,8 +79,7 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Clip
             super(v);
             vTime = (TextView) v.findViewById(R.id.activity_main_card_time);
             vDate = (TextView) v.findViewById(R.id.activity_main_card_date);
-            vText = (TextView) v.findViewById(R.id.activity_main_card_text);
-            vShare = v.findViewById(R.id.activity_main_card_share_button);
+            vText = (TextView) v.findViewById(R.id.sumary_event);
             vMain = v;
         }
     }

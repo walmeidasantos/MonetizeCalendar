@@ -136,7 +136,7 @@ public abstract class ContactsFragment extends Fragment implements AdapterView.O
                     ).show();
 
                 } else {
-
+                    //TODO remove this
                     Toast.makeText(
                             getActivity(),
                             "Your newest contacts arrived",
@@ -144,9 +144,12 @@ public abstract class ContactsFragment extends Fragment implements AdapterView.O
                     ).show();
 
                     List<ContactObject> ChoosedContacts = db.getContacts();
-                    for (int i = 0; i < contactObjects.size(); i++) {
-                        if ( ChoosedContacts.contains(contactObjects.get(i) ) ) {
-                            contactObjects.get(i).setChoosed();
+                    for (int count = 0; count < contactObjects.size(); count++) {
+                        for (int count2 = 0; count2 < ChoosedContacts.size(); count2++) {
+                            if (ChoosedContacts.get(count2).getGoogleId().contentEquals(contactObjects.get(count).getGoogleId())   ) {
+                                contactObjects.get(count).setChoosed();
+
+                            }
                         }
                     }
 
@@ -437,7 +440,7 @@ public abstract class ContactsFragment extends Fragment implements AdapterView.O
                         db.deleteContact(contactObject.getGoogleId());
 
                     } else {
-                       // db.addContact(contactObject);
+                        db.addContact(contactObject);
                         clipCardViewHolder.vCheckUser.setVisibility(View.VISIBLE);
                         contactObject.setChoosed();
                     }

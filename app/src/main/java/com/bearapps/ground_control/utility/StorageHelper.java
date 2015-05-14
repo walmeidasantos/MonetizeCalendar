@@ -22,6 +22,7 @@ import static com.bearapps.ground_control.utility.Storage.*;
                     CONTACT_STATUS + "` INTEGER DEFAULT '0', `" +
                     CONTACT_DTINC +  "` INTEGER DEFAULT 'CURRENT_TIMESTAMP' , `" +
                     CONTACT_NAME + "` TEXT, `" +
+                    CONTACT_PHOTO + "` TEXT, `" +
                     CONTACT_EMAIL + "` TEXT " +
                     "); ";
 
@@ -100,7 +101,7 @@ import static com.bearapps.ground_control.utility.Storage.*;
             "CREATE UNIQUE INDEX `contacts_id` ON `"+TABLE_CONTACTS +"` (`"+CONTACT_ID+"`  ASC); ";
 
     private String CREATE_INDICE_CONTACTS_EMAIL =
-            "CREATE UNIQUE INDEX `contacts_email` ON `"+TABLE_CONTACTS +"` (`"+CONTACT_EMAIL+"`  ASC); ";
+            "CREATE INDEX `contacts_email` ON `"+TABLE_CONTACTS +"` (`"+CONTACT_EMAIL+"`  ASC); ";
 
     private static final String CREATE_VIEW_EVENTSXCONTACTS =
             "CREATE VIEW " + VIEW_EVENTXCONTACTS + " AS SELECT a.*,b.* " +

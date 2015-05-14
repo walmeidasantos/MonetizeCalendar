@@ -3,15 +3,12 @@ package com.bearapps.ground_control.model;
 import android.app.IntentService;
 import android.content.ClipboardManager;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.bearapps.ground_control.UI.MainActivity;
-import com.bearapps.ground_control.utility.Storage;
 import com.bearapps.ground_control.R;
+import com.bearapps.ground_control.UI.MainActivity;
 
 /**
  * An {@link android.app.IntentService} subclass for handling asynchronous task requests in
@@ -71,12 +68,6 @@ public class EventObjectActionBridge extends IntentService {
                 return;*/
             case ACTION_OPEN_MAIN:
                 openMainActivity();
-                return;
-            case ACTION_REFRESH_WIDGET:
-                AppWidget.updateAllAppWidget(this);
-                return;
-            case ACTION_CHANGE_WIDGET_STAR:
-                changeWidgetStarredStatus();
                 return;
         }
     }
@@ -138,14 +129,5 @@ public class EventObjectActionBridge extends IntentService {
         startActivity(i);
     }
 
-    private void changeWidgetStarredStatus() {
-        SharedPreferences preference = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean isStarred = preference.getBoolean(AppWidget.WIDGET_IS_STARRED, false);
-        preference.edit()
-                .putBoolean(AppWidget.WIDGET_IS_STARRED, !isStarred)
-                .apply();
-
-        AppWidget.updateAllAppWidget(this);
-    }
 
 }

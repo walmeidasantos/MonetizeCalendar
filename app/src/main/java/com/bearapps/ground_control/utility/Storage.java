@@ -35,6 +35,7 @@ public class Storage {
     public static final String CONTACT_ID = "id";
     public static final String CONTACT_NAME = "name";
     public static final String CONTACT_EMAIL = "email";
+    public static final String CONTACT_PHOTO = "photo";
 
     public static final int CONTACT_ACTIVE = 0;
     public static final int CONTACT_INACTIVE = 1;
@@ -218,7 +219,7 @@ public class Storage {
         open();
         int row_id = db.delete(
                 TABLE_CONTACTS,
-                CONTACT_GOOGLEID + "=`" + googleId + "`",
+                CONTACT_GOOGLEID + "='" + googleId + "'",
                 null
         );
         close();
@@ -304,7 +305,7 @@ public class Storage {
 
         ContentValues ContactsValues = new ContentValues();
         ContactsValues.put(CONTACT_GOOGLEID, contactObject.getGoogleId());
-        ContactsValues.put(CONTACT_EMAIL, contactObject.getGoogleId());
+        ContactsValues.put(CONTACT_EMAIL, contactObject.getEmail());
         ContactsValues.put(CONTACT_NAME, contactObject.getName());
 
         long row_id = db.insert(TABLE_CONTACTS, null, ContactsValues);
@@ -337,11 +338,11 @@ public class Storage {
                 whereParam = null;
                 whereClause = null;
             }
-            String[] COLUMNS_CONTACTS = {CONTACT_GOOGLEID, CONTACT_NAME, CONTACT_EMAIL, CONTACT_STATUS };
+            String[] COLUMNS_CONTACTS = {CONTACT_GOOGLEID, CONTACT_NAME, CONTACT_EMAIL, CONTACT_STATUS,CONTACT_PHOTO };
 
             Cursor cursor_Contacts;
 
-            cursor_Contacts = db.query(VIEW_EVENTXCONTACTS,
+            cursor_Contacts = db.query(TABLE_CONTACTS,
                     COLUMNS_CONTACTS,
                     whereClause,//where clause
                     whereParam,//where params
@@ -357,9 +358,11 @@ public class Storage {
                                 cursor_Contacts.getString(0),
                                 cursor_Contacts.getString(1),
                                 cursor_Contacts.getString(2),
-                                cursor_Contacts.getString(3)
+                                null,//left disable the status
+                                cursor_Contacts.getString(4)
                         )
                 );
+
             }
 
             cursor_Contacts.close();

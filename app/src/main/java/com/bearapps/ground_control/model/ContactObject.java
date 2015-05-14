@@ -30,7 +30,6 @@ public class ContactObject {
 
     }
 
-
     public String getGoogleId() {
         return googleidId;
     }
