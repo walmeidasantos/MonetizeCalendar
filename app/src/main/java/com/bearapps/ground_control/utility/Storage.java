@@ -10,9 +10,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.bearapps.ground_control.R;
 import com.bearapps.ground_control.model.ContactObject;
 import com.bearapps.ground_control.model.EventObject;
-import com.bearapps.ground_control.model.EventObjectActionBridge;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.EventDateTime;
 
@@ -70,7 +70,7 @@ public class Storage {
 
     public static final String TABLE_EVENTXCONTACT = "event_contacts";
     public static final String EVENTXCONTACT_CONTACTID = "idcontact";
-    public static final String EVENTXCONTACT_EVENTID = "idvevent";
+    public static final String EVENTXCONTACT_EVENTID = "idevent";
     public static final String EVENTXCONTACT_ID = "id";
 
     public static final String TABLE_INVOICEXEVENTS = "invoice_events";
@@ -80,7 +80,6 @@ public class Storage {
 
     public static final String VIEW_EVENTXCONTACTS = "view_eventxcontacts";
     public static final String VIEW_INVOICEXEVENTS = "view_invoicexevents";
-
 
     private static Storage mInstance = null;
     private StorageHelper dbHelper;
@@ -129,24 +128,16 @@ public class Storage {
     }
 
     public List<EventObject> getEvents() {
-        EventsInMemory = getEvents(null,null) ;
-            return EventsInMemory;
-    }
-
-    public List<EventObject> getEvents(Integer id, Integer status) {
-        String[] whereParam = {String.valueOf(status), String.valueOf(id)};
-        String whereClause = EVENTS_STATUS + " = ? AND " + EVENTS_ID + " = ? ";
+        String[] whereParam = {String.valueOf(EVENT_DECISION) };
+        String whereClause = EVENTS_STATUS + " = ? " ;
 
         List<Integer> contactsid = null;
         if (isEventInMemoryChanged) {
             open();
 
             String sortOrder = EVENTS_DTINC + " ASC ";
-            if (id == null) {
-                whereParam = null;
-                whereClause = null;
-            }
-            String[] COLUMNS_EVENTS = {EVENTS_GOOGLEID, EVENTS_SUMARY, EVENTS_BEGINEVENT, EVENTS_ENDEVENT, EVENTS_WHERE, CONTACT_EMAIL};
+
+            String[] COLUMNS_EVENTS = {EVENTS_GOOGLEID, EVENTS_SUMARY, EVENTS_BEGINEVENT, EVENTS_ENDEVENT, EVENTS_WHERE, CONTACT_EMAIL, EVENTS_ID, CONTACT_NAME};
             Cursor cursor_events;
 
             cursor_events = db.query(VIEW_EVENTXCONTACTS,
@@ -162,17 +153,10 @@ public class Storage {
             EventsInMemory = new ArrayList<>();
             while (cursor_events.moveToNext()) {
 
-
-                if (googleidStorage.equals(cursor_events.getString(0))) {
-                    contactsid.add(cursor_events.getInt(1));
-                    EventsInMemory.get(EventsInMemory.size() - 1).AddContact(cursor_events.getString(6));
-                } else {
-                    googleidStorage = cursor_events.getString(0);
-
-                    EventDateTime BeginDate = null;
+                    EventDateTime BeginDate = new EventDateTime();
                     BeginDate.setDateTime(new DateTime(cursor_events.getLong(2)));
 
-                    EventDateTime EndDate = null;
+                    EventDateTime EndDate = new EventDateTime();
                     EndDate.setDateTime(new DateTime(cursor_events.getLong(3)));
 
                     EventsInMemory.add(
@@ -181,12 +165,13 @@ public class Storage {
                                     cursor_events.getString(1),
                                     BeginDate,
                                     EndDate,
-                                    cursor_events.getString(4),
-                                    contactsid
+                                    cursor_events.getString(4)
                             )
-
                     );
-                }
+                    EventsInMemory.get( EventsInMemory.size() -1 ).setId(cursor_events.getInt(6));//this makes no sense but is for test purpose
+
+                EventsInMemory.get(EventsInMemory.size() - 1).AddContact(cursor_events.getString(5));
+
 
             }
             cursor_events.close();
@@ -196,14 +181,18 @@ public class Storage {
 
         if (EventsInMemory.isEmpty()) {
             DateTime start = new DateTime(now, TimeZone.getTimeZone(TimeZone.getDefault().getID()));
+            EventDateTime StartEvent = new EventDateTime();
+            StartEvent.setDate(start);
+            StartEvent.setDateTime(start);
+            StartEvent.setTimeZone(TimeZone.getDefault().getID());
 
             EventsInMemory.add(
                     new EventObject(
                             "",
-                            "Empty",
-                            new EventDateTime().setDateTime(start),
-                            new EventDateTime().setDateTime(start),
-                            "Empty",
+                            context.getString(R.string.empty),
+                            StartEvent,
+                            StartEvent,
+                            context.getString(R.string.empty),
                             contactsid
                     )
             );
@@ -226,7 +215,6 @@ public class Storage {
         if (row_id == -1) {
             Log.e("Storage", "write db error: Event id " + googleId + ".");
         }
-        refreshAllEventsList(true, null);
     }
 
 
@@ -243,12 +231,11 @@ public class Storage {
         if (row_id == -1) {
             Log.e("Storage", "write db error: Event id " + EventId + ".");
         }
-        refreshAllEventsList(true, null);
     }
 
     private boolean addEvent(EventObject eventObject) {
 
-        List<String> ContactsId = eventObject.getContactsId();
+        List<String> ContactsEmails = eventObject.getContactsEmails();
         Boolean error = false;
 
         ContentValues EventsValues = new ContentValues();
@@ -259,6 +246,8 @@ public class Storage {
         EventsValues.put(EVENTS_BEGINEVENT, eventObject.getBeginEvent().getValue()  );
         EventsValues.put(EVENTS_ENDEVENT, eventObject.getEndEvent().getValue()  );
 
+        db.beginTransaction();
+
         long row_id = db.insert(TABLE_EVENTS, null, EventsValues);
         if (row_id == -1) {
             Log.e("Storage", "write db error: addEvent " + eventObject.getGoogleId());
@@ -268,18 +257,24 @@ public class Storage {
             eventObject.setId((int) row_id);
         }
 
-  /*      if (!error) {
-            for (String Contact: ContactsId) {
+      if (!error) {
+            for (String Contact: ContactsEmails) {
                 EventsxContactsValues.put(EVENTXCONTACT_EVENTID,   eventObject.getId());
                 EventsxContactsValues.put(EVENTXCONTACT_CONTACTID, Contact);
+                row_id = db.insert(TABLE_EVENTXCONTACT, null, EventsxContactsValues);
             }
-            row_id = db.insert(TABLE_EVENTXCONTACT, null, EventsxContactsValues);
             if (row_id == -1) {
                 Log.e("Storage", "write db error: AddEventsxContacts " + eventObject.getGoogleId());
                 error = true;
+
+            }
+            else{
+                db.setTransactionSuccessful();
             }
 
-        }*/
+        }
+
+        db.endTransaction();
 
         return !error;
     }
@@ -322,30 +317,21 @@ public class Storage {
     }
 
     public List<ContactObject> getContacts() {
-        ContactsInMemory = getContacts(null,null) ;
-        return ContactsInMemory;
-    }
 
-    public List<ContactObject> getContacts(Integer id, Integer status) {
-        String[] whereParam = {String.valueOf(status),String.valueOf(id) };
-        String whereClause  = CONTACT_STATUS + " = ? AND " + CONTACT_ID + " = ? "  ;
 
         if (isContactInMemoryChanged) {
             open();
 
             String sortOrder = CONTACT_NAME + " ASC ";
-            if ( id == null){
-                whereParam = null;
-                whereClause = null;
-            }
+
             String[] COLUMNS_CONTACTS = {CONTACT_GOOGLEID, CONTACT_NAME, CONTACT_EMAIL, CONTACT_STATUS,CONTACT_PHOTO };
 
             Cursor cursor_Contacts;
 
             cursor_Contacts = db.query(TABLE_CONTACTS,
                     COLUMNS_CONTACTS,
-                    whereClause,//where clause
-                    whereParam,//where params
+                    null,//where clause
+                    null,//where params
                     null,//groupby
                     null,//having
                     sortOrder);//orderby
@@ -375,11 +361,28 @@ public class Storage {
     }
 
 
-    public EventObject changeEventStatus(EventObject eventObject) {
+    public EventObject changeEventStatus(EventObject eventObject,int Deciscion) {
         open();
         latsUpdate = new Date();
         isEventInMemoryChanged = true;
-        refreshAllEventsList(false, null);
+        ContentValues EventsValues = new ContentValues();
+
+        switch (Deciscion) {
+            case EVENT_CANCEL:
+                EventsValues.put(EVENTS_STATUS, EVENT_CANCEL);
+            case EVENT_DECISION:
+                EventsValues.put(EVENTS_STATUS, EVENT_CANCEL);
+            case EVENT_CONCLUDED:
+                EventsValues.put(EVENTS_STATUS, EVENT_CANCEL);
+        }
+        String whereClause = EVENTS_ID + " = ?";
+
+        db.update(TABLE_EVENTS,
+                EventsValues,
+                  whereClause,
+                new String[] { eventObject.getId().toString() } );
+
+        close();
         return eventObject;
     }
 
@@ -391,7 +394,6 @@ public class Storage {
         close();
         latsUpdate = new Date();
         isEventInMemoryChanged = true;
-        refreshAllEventsList(true, null);
     }
 
    public void modifyClip(Integer oldEvent, Integer newEvent ) {
@@ -405,13 +407,6 @@ public class Storage {
 
         //refreshAllEventsList(!newEvent.isEmpty(), oldEvent);
 
-    }
-
-    private void refreshAllEventsList(Boolean added, String deletedString) {
-        updateDbBroadcast(context, added, deletedString);
-        context.startService(new Intent(context, EventObjectActionBridge.class)
-                        .putExtra(EventObjectActionBridge.ACTION_CODE, EventObjectActionBridge.ACTION_REFRESH_WIDGET)
-        );
     }
 
     public static void updateDbBroadcast(Context context, Boolean added, String deletedString) {

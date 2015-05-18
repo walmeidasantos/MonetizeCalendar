@@ -118,6 +118,9 @@
     <string name="contact_picture">contact picture</string>
     <string name="event_date">Event Date</string>
     <string name="photo">photo contact</string>
+    <string name="event_cancel">Event cancel</string>
+    <string name="event_concluded">Event concluded</string>
+    <string name="empty">Empty</string>
     <string-array name="card_array">
         <item>Main</item>
         <item>Screen 1 </item>

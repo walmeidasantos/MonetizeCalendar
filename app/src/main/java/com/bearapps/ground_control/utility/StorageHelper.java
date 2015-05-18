@@ -54,9 +54,9 @@ import static com.bearapps.ground_control.utility.Storage.*;
     private static final String CREATE_EVENTSXCONTACTS =
             "CREATE TABLE " + TABLE_EVENTXCONTACT + " ( `" +
                     EVENTXCONTACT_ID + "` INTEGER PRIMARY KEY AUTOINCREMENT, `" +
-                    EVENTXCONTACT_CONTACTID + "` INTEGER , `" +
+                    EVENTXCONTACT_CONTACTID + "` TEXT , `" +
                     EVENTXCONTACT_EVENTID + "` INTEGER, " +
-                    "  FOREIGN KEY( `" + EVENTXCONTACT_CONTACTID + "` ) REFERENCES `" + TABLE_CONTACTS + "` ( `" + CONTACT_ID + "`), " +
+                    "  FOREIGN KEY( `" + EVENTXCONTACT_CONTACTID + "` ) REFERENCES `" + TABLE_CONTACTS + "` ( `" + CONTACT_EMAIL + "`), " +
                     "  FOREIGN KEY( `" + EVENTXCONTACT_EVENTID + "` ) REFERENCES `" + TABLE_EVENTS + "` (`" + EVENTS_ID + "`) " +
                     "); ";
 
@@ -109,7 +109,7 @@ import static com.bearapps.ground_control.utility.Storage.*;
                     " JOIN " + TABLE_EVENTS + " AS a ON " +
                     EVENTXCONTACT_EVENTID + " = a." + EVENTS_ID +
                     " JOIN " + TABLE_CONTACTS + " AS b ON " +
-                    EVENTXCONTACT_CONTACTID + " = b." + CONTACT_ID + "; ";
+                    EVENTXCONTACT_CONTACTID + " = b." + CONTACT_EMAIL + "; ";
 
     private static final String CREATE_VIEW_INVOICEXEVENTS =
             "CREATE VIEW " + VIEW_INVOICEXEVENTS + " AS SELECT a.*,b.* " +

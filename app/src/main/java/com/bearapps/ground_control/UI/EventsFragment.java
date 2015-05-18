@@ -33,12 +33,15 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecovera
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.client.util.DateTime;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.Events;
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.SnackbarManager;
+import com.nispok.snackbar.listeners.ActionClickListener;
+import com.nispok.snackbar.listeners.EventListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,6 +55,14 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
     private EventCardAdapter mAdapter;
     private Storage db;
     private Context context;
+    private String message;
+
+
+
+    private int isYHidden = -1;
+    private int isXHidden = -1;
+    private int isSnackbarShow = 0;
+
 
     /** Required Overrides for Sample Fragments */
 
@@ -96,7 +107,6 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
 
 
         mAdapter = getAdapter();
-        //mAdapter.AddEvents(db.getEvents());
         mAdapter.setOnItemClickListener(this);
         mList.setAdapter(mAdapter);
 
@@ -111,6 +121,52 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
                 transport, jsonFactory, credential)
                 .setApplicationName("Calendar API Android Quickstart")
                 .build();
+
+
+        SwipeableRecyclerViewTouchListener swipeDeleteTouchListener =
+                new SwipeableRecyclerViewTouchListener(
+                        mList,
+                        new SwipeableRecyclerViewTouchListener.SwipeListener() {
+                            @Override
+                            public boolean canSwipe(int position) {
+
+                                if ( db.getEvents().get(position).getSumary() == context.getString(R.string.empty) ) {
+                                    return false;
+                                }
+
+                                return true;
+                            }
+                            @Override
+                            public void onDismissedBySwipeLeft(RecyclerView recyclerView, int[] reverseSortedPositions) {
+                                for (int position : reverseSortedPositions) {
+                                    showSnackbar(position, db.getEvents().get(position), mAdapter, db.EVENT_CANCEL);
+                                    mAdapter.remove(position);
+
+                                }
+                            }
+
+                            @Override
+                            public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] reverseSortedPositions) {
+                                for (int position : reverseSortedPositions) {
+                                    showSnackbar(position, db.getEvents().get(position), mAdapter, db.EVENT_CONCLUDED);
+                                    mAdapter.remove(position);
+                                }
+                            }
+                        });
+
+        RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                    if (isSnackbarShow > 0) return;
+                }
+
+
+        };
+        mList.setOnScrollListener(scrollListener);
+        mList.addOnItemTouchListener(swipeDeleteTouchListener);
+
+
 
 
 
@@ -244,10 +300,7 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
             case REQUEST_AUTHORIZATION:
                 if (resultCode == getActivity().RESULT_OK) {
                     refreshEventList();
-                    mAdapter = getAdapter();
                     mAdapter.AddEvents(db.getEvents());
-                    mAdapter.notifyDataSetChanged();
-                    mList.notify();
                 } else {
                     chooseAccount();
                 }
@@ -292,9 +345,7 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
                     ).show();
 
                     db.importEvents(eventObjects);
-                    mAdapter = getAdapter();
-                    mAdapter.notifyDataSetChanged();
-
+                    mAdapter.AddEvents(eventObjects);
                 }
             }
         });
@@ -385,8 +436,6 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
      */
     private List<EventObject> fetchEventsFromCalendar() throws IOException {
         // List the next 10 events from the primary calendar.
-        DateTime now = new DateTime(System.currentTimeMillis());
-        String pageToken = null;
         List<String> EventsAttendee = new ArrayList<>();
         List<EventObject> eventsObject =  new ArrayList<>();
 
@@ -462,6 +511,80 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
 
 
 
+    }
+
+    private void showSnackbar(final int position, final EventObject eventObject, final EventCardAdapter eventCardAdapter, final int decision) {
+        final boolean[] isUndo = new boolean[1];
+
+
+        if (decision == db.EVENT_CANCEL) {
+            message = getString(R.string.event_cancel);
+        }
+        else if (decision == db.EVENT_CONCLUDED) {
+            message = getString(R.string.event_concluded);
+        }
+
+
+        SnackbarManager.show(
+                Snackbar.with(getActivity())
+                        .text(message)
+                        .actionLabel(getString(R.string.toast_undo))
+                        .actionColor(getResources().getColor(R.color.accent))
+                        .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                        .eventListener(new EventListener() {
+                            @Override
+                            public void onShow(Snackbar snackbar) {
+                                if (position >= (eventCardAdapter.getItemCount() - 1) && eventCardAdapter.getItemCount() > 6) {
+                                    mList.animate().translationY(-snackbar.getHeight());
+                                }
+                            }
+
+                            @Override
+                            public void onShowByReplace(Snackbar snackbar) {
+                                isSnackbarShow += 1;
+                            }
+
+                            @Override
+                            public void onShown(Snackbar snackbar) {
+                                isSnackbarShow += 1;
+                            }
+
+                            @Override
+                            public void onDismiss(Snackbar snackbar) {
+                                isSnackbarShow -= 1;
+                                if (!isUndo[0]) {
+                                    db.changeEventStatus(eventObject, decision);
+                                }
+                            }
+
+                            @Override
+                            public void onDismissByReplace(Snackbar snackbar) {
+                                isSnackbarShow -= 1;
+                                if (!isUndo[0]) {
+                                    db.changeEventStatus(eventObject, decision);
+                                }
+                            }
+
+                            @Override
+                            public void onDismissed(Snackbar snackbar) {
+                                if (isSnackbarShow <= 0) {
+                                    isSnackbarShow = 0;
+                                    mList.animate().translationY(0);
+                                }
+
+                            }
+                        })
+                        .actionListener(new ActionClickListener() {
+                            @Override
+                            public void onActionClicked(Snackbar snackbar) {
+                                isUndo[0] = true;
+                                mAdapter.add(position, eventObject);
+                                mList.animate().translationY(0);
+                                db.changeEventStatus(eventObject, db.EVENT_DECISION);
+                                getLayoutManager().scrollToPosition(position);
+                            }
+                        })
+                , getActivity());
     }
 
 }

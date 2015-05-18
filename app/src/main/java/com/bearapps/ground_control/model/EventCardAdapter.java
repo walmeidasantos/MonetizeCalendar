@@ -43,9 +43,11 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Clip
     public void onBindViewHolder(final ClipCardViewHolder clipCardViewHolder, int i) {
         final EventObject eventObject = eventObjectList.get(i);
 
-        clipCardViewHolder.vDate.setText(eventObject.getBeginEvent().toString()  );
-        clipCardViewHolder.vTime.setText(eventObject.getBeginEvent().toString() );
-        clipCardViewHolder.vText.setText(MyUtil.stringLengthCut(eventObject.getSumary() ));
+        clipCardViewHolder.vDate.setText(eventObject.getBeginEventDate() );
+        clipCardViewHolder.vTime.setText(eventObject.getBeginEventTime() );
+        clipCardViewHolder.vDay.setText(eventObject.getBeginEventDate().substring(0,2) );
+        clipCardViewHolder.vContactsName.setText(eventObject.getFirstContact() );
+        clipCardViewHolder.vSummary.setText(MyUtil.stringLengthCut(eventObject.getSumary()));
 
     }
 
@@ -71,15 +73,18 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Clip
     public class ClipCardViewHolder extends RecyclerView.ViewHolder {
         protected TextView vTime;
         protected TextView vDate;
-        protected TextView vText;
-        protected View vShare;
+        protected TextView vDay;
+        protected TextView vSummary;
+        protected TextView vContactsName;
         protected View vMain;
 
         public ClipCardViewHolder(View v) {
             super(v);
             vTime = (TextView) v.findViewById(R.id.activity_main_card_time);
             vDate = (TextView) v.findViewById(R.id.activity_main_card_date);
-            vText = (TextView) v.findViewById(R.id.sumary_event);
+            vContactsName = (TextView) v.findViewById(R.id.contacts_names);
+            vSummary = (TextView) v.findViewById(R.id.summary_event);
+            vDay = (TextView) v.findViewById(R.id.day);
             vMain = v;
         }
     }
