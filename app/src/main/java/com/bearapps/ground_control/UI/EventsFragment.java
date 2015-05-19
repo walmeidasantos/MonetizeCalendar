@@ -57,10 +57,6 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
     private Context context;
     private String message;
 
-
-
-    private int isYHidden = -1;
-    private int isXHidden = -1;
     private int isSnackbarShow = 0;
 
 
@@ -191,11 +187,7 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
                 Toast.LENGTH_SHORT).show();
     }
 
-    public int getDefaultItemCount() {
-        return 10;
-    }
-
-    /**
+   /**
      * Called whenever this activity is pushed to the foreground, such as after
      * a call to onCreate().
      */
@@ -213,13 +205,7 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
         }
     }
 
-    /**
-     * Check that Google Play services APK is installed and up to date. Will
-     * launch an error dialog for the user to update Google Play Services if
-     * possible.
-     * @return true if Google Play Services is available and up to
-     *     date on this device; false otherwise.
-     */
+
     private boolean isGooglePlayServicesAvailable() {
         final int connectionStatusCode =
                 GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity());
@@ -233,12 +219,7 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
     }
 
 
-    /**
-     * Display an error dialog showing that Google Play Services is missing
-     * or out of date.
-     * @param connectionStatusCode code describing the presence (or lack of)
-     *     Google Play Services on this device.
-     */
+
     public void showGooglePlayServicesAvailabilityErrorDialog(
             final int connectionStatusCode) {
         getActivity().runOnUiThread(new Runnable() {
@@ -310,12 +291,7 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    /**
-     * Fill the event display with the given List of strings; called from
-     * background threads and async tasks that need to update the UI (in the
-     * UI thread).
-     * @param eventObjects a List of Strings to populate the event display with.
-     */
+
     public void updateEventList(final List<EventObject> eventObjects) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -352,12 +328,6 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
     }
 
 
-
-    /**
-     * Show a status message in the list header TextView; called from background
-     * threads and async tasks that need to update the UI (in the UI thread).
-     * @param message a String to display in the UI header TextView.
-     */
     public void updateStatus(final String message) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -373,11 +343,6 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
 
 
 
-    /**
-     * Attempt to get a list of calendar events to display. If the email
-     * address isn't known yet, then call chooseAccount() method so the user
-     * can pick an account.
-     */
     private void refreshEventList() {
         if (credential.getSelectedAccountName() == null) {
             chooseAccount();
@@ -395,19 +360,13 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
         }
     }
 
-    /**
-     * Starts an activity in Google Play Services so the user can pick an
-     * account.
-     */
+
     private void chooseAccount() {
         startActivityForResult(
                 credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
     }
 
-    /**
-     * Checks whether the device currently has a network connection.
-     * @return true if the device has a network connection, false otherwise.
-     */
+
     private boolean isDeviceOnline() {
         ConnectivityManager connMgr =
                 (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -476,16 +435,9 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
         return eventsObject;
     }
 
-    /**
-     * An asynchronous task that handles the Calendar API event list retrieval.
-     * Placing the API calls in their own task ensures the UI stays responsive.
-     */
+
     private class EventFecthTask extends AsyncTask<Void, Void, Void> {
 
-        /**
-         * Background task to call Calendar API to fetch event list.
-         * @param params no parameters needed for this task.
-         */
         @Override
         protected Void doInBackground(Void... params) {
             try {

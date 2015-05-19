@@ -7,12 +7,12 @@ import android.support.v7.widget.RecyclerView;
 
 import com.bearapps.ground_control.utility.Storage;
 
-public class ContactMainFragment extends ContactsFragment {
+public class EditContactMainFragment extends ContactsFragment {
     private Storage db;
 
 
-    public static ContactMainFragment newInstance() {
-        ContactMainFragment fragment = new ContactMainFragment();
+    public static EditContactMainFragment newInstance() {
+        EditContactMainFragment fragment = new EditContactMainFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;

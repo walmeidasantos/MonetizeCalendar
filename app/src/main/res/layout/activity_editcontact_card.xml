@@ -1,0 +1,131 @@
+<android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_gravity="clip_horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    card_view:cardCornerRadius="4dp"
+    card_view:cardBackgroundColor="#E6E6E6"
+    card_view:cardElevation="10dp" >
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:id="@+id/editcontact_layout"
+        android:divider="@drawable/divider"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false">
+
+        <RelativeLayout
+            android:layout_marginTop="@dimen/abc_action_bar_subtitle_bottom_margin_material"
+            android:layout_marginBottom="@dimen/abc_action_bar_subtitle_bottom_margin_material"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="90dp">
+
+
+            <RelativeLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:id="@+id/part1">
+
+                <QuickContactBadge
+                    android:id="@+id/photo_contact"
+                    android:contentDescription="@string/photo"
+                    android:src="@drawable/avatar_empty"
+                    style="@style/EditImage"    />
+
+                <TextView
+                    android:id="@+id/contacts_names"
+                    android:gravity="start|bottom|left"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="John Doe"
+                    android:textSize="@dimen/abc_text_size_body_2_material"
+                    android:textColor="@color/highlighted_text_material_light"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_alignBottom="@+id/photo_contact"
+                    android:layout_toRightOf="@+id/photo_contact"
+                    android:layout_toEndOf="@+id/photo_contact" />
+
+                <TextView
+                    android:id="@+id/text_contact_email"
+                    android:gravity="start|bottom|left"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="email@test.com"
+                    android:textSize="@dimen/abc_text_size_body_2_material"
+                    android:textColor="@color/highlighted_text_material_light"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@id/contacts_names"/>
+
+
+            </RelativeLayout>
+            <RelativeLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_toRightOf="@id/part1"
+                android:id="@+id/relativeLayout">
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/text_period"
+                android:gravity="left"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text=" Every month "
+                android:textSize="@dimen/abc_text_size_body_2_material"
+                android:textColor="@color/highlighted_text_material_light"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toLeftOf="@+id/text_amount"
+                android:layout_toStartOf="@+id/text_amount" />
+
+            <TextView
+                android:id="@+id/text_amount"
+                android:gravity="left"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text=" 10.00 "
+                android:textSize="@dimen/abc_text_size_body_2_material"
+                android:textColor="@color/highlighted_text_material_light"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginRight="39dp"
+                android:layout_marginEnd="39dp" />
+
+
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:layout_below="@id/editcontact_layout"
+        android:background="#B6B6B6" />
+
+</RelativeLayout>
+
+</android.support.v7.widget.CardView>
