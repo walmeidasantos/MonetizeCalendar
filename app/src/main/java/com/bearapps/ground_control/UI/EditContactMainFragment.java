@@ -7,7 +7,7 @@ import android.support.v7.widget.RecyclerView;
 
 import com.bearapps.ground_control.utility.Storage;
 
-public class EditContactMainFragment extends ContactsFragment {
+public class EditContactMainFragment extends EditContactsFragment {
     private Storage db;
 
 
@@ -26,7 +26,7 @@ public class EditContactMainFragment extends ContactsFragment {
 
     @Override
     protected RecyclerView.LayoutManager getLayoutManager() {
-        return new GridLayoutManager(getActivity(), 4, GridLayoutManager.VERTICAL, false);
+        return new GridLayoutManager(getActivity(), 4, GridLayoutManager.HORIZONTAL, false);
     }
 
     @Override
@@ -35,14 +35,9 @@ public class EditContactMainFragment extends ContactsFragment {
     }
 
     @Override
-    public int getDefaultItemCount() {
-        return 40;
-    }
+    protected EditContactAdapter getAdapter() {
 
-    @Override
-    protected ContactAdapter getAdapter() {
-
-            return new ContactAdapter(db.getContacts());
+            return new EditContactAdapter(db.getContacts());
     }
 
 

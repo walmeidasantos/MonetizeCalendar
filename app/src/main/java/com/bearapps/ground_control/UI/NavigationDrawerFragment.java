@@ -17,9 +17,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
 import com.bearapps.ground_control.R;
 
@@ -113,9 +110,9 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
 
     public List<NavigationItem> getMenu() {
         List<NavigationItem> items = new ArrayList<NavigationItem>();
-        items.add(new NavigationItem("item 1", getResources().getDrawable(R.drawable.ic_menu_check)));
-        items.add(new NavigationItem("item 2", getResources().getDrawable(R.drawable.ic_menu_check)));
-        items.add(new NavigationItem("item 3", getResources().getDrawable(R.drawable.ic_menu_check)));
+        items.add(new NavigationItem(getActivity().getString(R.string.events), getResources().getDrawable(R.drawable.ic_menu_check)));
+        items.add(new NavigationItem(getActivity().getString(R.string.contacts), getResources().getDrawable(R.drawable.ic_menu_check)));
+        items.add(new NavigationItem(getActivity().getString(R.string.edit_contacts), getResources().getDrawable(R.drawable.ic_menu_check)));
         return items;
     }
 

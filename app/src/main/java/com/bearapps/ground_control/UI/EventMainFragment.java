@@ -36,11 +36,6 @@ public class EventMainFragment extends EventsFragment {
     }
 
     @Override
-    public int getDefaultItemCount() {
-        return 40;
-    }
-
-    @Override
     protected EventCardAdapter getAdapter() {
 
             return new EventCardAdapter(db.getEvents());

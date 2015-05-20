@@ -1,13 +1,8 @@
 package com.bearapps.ground_control.UI;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -25,24 +20,20 @@ import com.bearapps.ground_control.R;
 import com.bearapps.ground_control.model.ContactObject;
 import com.bearapps.ground_control.utility.Storage;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 
 public abstract class EditContactsFragment extends Fragment implements AdapterView.OnItemClickListener {
 
     private RecyclerView mList;
-    private ContactAdapter mAdapter;
+    private EditContactAdapter mAdapter;
     private Storage db;
     private Context context;
     private String TAG = "ground_control";
 
     protected abstract RecyclerView.LayoutManager getLayoutManager();
     protected abstract RecyclerView.ItemDecoration getItemDecoration();
-    protected abstract ContactAdapter getAdapter();
+    protected abstract EditContactAdapter getAdapter();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,7 +44,7 @@ public abstract class EditContactsFragment extends Fragment implements AdapterVi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.view_contact_recycler, container, false);
+        View rootView = inflater.inflate(R.layout.view_editcontact_recycler, container, false);
 
         mList = (RecyclerView) rootView.findViewById(R.id.contact_list);
         mList.setLayoutManager(getLayoutManager());
@@ -68,7 +59,6 @@ public abstract class EditContactsFragment extends Fragment implements AdapterVi
         db = Storage.getInstance(context);
 
         mAdapter = getAdapter();
-        //mAdapter.AddContacts(db.getContacts());
         mAdapter.setOnItemClickListener(this);
         mList.setAdapter(mAdapter);
 
@@ -93,42 +83,18 @@ public abstract class EditContactsFragment extends Fragment implements AdapterVi
                 Toast.LENGTH_SHORT).show();
     }
 
-     /**
-     * Called whenever this activity is pushed to the foreground, such as after
-     * a call to onCreate().
-     */
-    @Override
-    public void onResume() {
-        super.onResume();
-            refreshContactList();
-
-    }
-
-    private void refreshContactList() {
-
-        getActivity().setProgressBarIndeterminateVisibility(true);
-        new ContactFecthTask().execute();
-    }
-
       /**
-     * Created by ursow on 11/04/15.
+     * Created by ursow on 19/05/15.
      */
-    private class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ClipCardViewHolder> {
+    public class EditContactAdapter extends RecyclerView.Adapter<EditContactAdapter.ClipCardViewHolder> {
         private List<ContactObject> contactObjectList;
         private boolean allowAnimate = true;
         private AdapterView.OnItemClickListener mOnItemClickListener;
-        public ContactAdapter(List<ContactObject> Contacts)  {
+        public EditContactAdapter(List<ContactObject> Contacts)  {
 
             contactObjectList = Contacts;
             notifyDataSetChanged();
 
-        }
-
-        public void AddContacts(List<ContactObject> Contacts) {
-            contactObjectList.clear();
-            contactObjectList.addAll(Contacts);
-
-            notifyDataSetChanged();
         }
 
         @Override
@@ -203,15 +169,6 @@ public abstract class EditContactsFragment extends Fragment implements AdapterVi
             return new ClipCardViewHolder(itemView);
         }
 
-        public void add(int position, ContactObject contactObject) {
-            contactObjectList.add(position, contactObject);
-            notifyItemInserted(position);
-        }
-
-        public void remove(int position) {
-            contactObjectList.remove(position);
-            notifyItemRemoved(position);
-        }
 
         public class ClipCardViewHolder extends RecyclerView.ViewHolder {
             protected TextView vContact;

@@ -110,7 +110,7 @@
     <View
         android:layout_width="fill_parent"
         android:layout_height="1px"
-        android:layout_below="@id/main_view"
+        android:layout_below="@id/invoice_view"
         android:background="#B6B6B6" />
 
 </RelativeLayout>

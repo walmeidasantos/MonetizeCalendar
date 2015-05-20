@@ -121,6 +121,9 @@
     <string name="event_cancel">Event cancel</string>
     <string name="event_concluded">Event concluded</string>
     <string name="empty">Empty</string>
+    <string name="events">Events</string>
+    <string name="contacts">Contacts</string>
+    <string name="edit_contacts">Edit Contacts</string>
     <string-array name="card_array">
         <item>Main</item>
         <item>Screen 1 </item>
