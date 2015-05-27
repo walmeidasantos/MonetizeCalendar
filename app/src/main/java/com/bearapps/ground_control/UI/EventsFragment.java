@@ -100,8 +100,6 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
         context = getActivity().getBaseContext();
 
         db = Storage.getInstance(context);
-
-
         mAdapter = getAdapter();
         mAdapter.setOnItemClickListener(this);
         mList.setAdapter(mAdapter);
@@ -288,7 +286,6 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
                 break;
         }
 
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
 

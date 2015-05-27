@@ -124,6 +124,11 @@
     <string name="events">Events</string>
     <string name="contacts">Contacts</string>
     <string name="edit_contacts">Edit Contacts</string>
+    <string name="periodic_charge">Periodic time of charge:</string>
+    <string name="montly">Monthly</string>
+    <string name="weekly">Weekly</string>
+    <string name="per_class">Per class</string>
+    <string name="per_hour">Per Hour</string>
     <string-array name="card_array">
         <item>Main</item>
         <item>Screen 1 </item>

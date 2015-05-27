@@ -23,6 +23,8 @@ import static com.bearapps.ground_control.utility.Storage.*;
                     CONTACT_DTINC +  "` INTEGER DEFAULT 'CURRENT_TIMESTAMP' , `" +
                     CONTACT_NAME + "` TEXT, `" +
                     CONTACT_PHOTO + "` TEXT, `" +
+                    CONTACT_CHARGE + "` REAL DEFAULT '0', `" +
+                    CONTACT_PERIOD + "` TEXT, `" +
                     CONTACT_EMAIL + "` TEXT " +
                     "); ";
 

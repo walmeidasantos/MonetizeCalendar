@@ -1,6 +1,7 @@
 package com.bearapps.ground_control.UI;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -30,6 +31,7 @@ public abstract class EditContactsFragment extends Fragment implements AdapterVi
     private Storage db;
     private Context context;
     private String TAG = "ground_control";
+    private ContactObject contactObject;
 
     protected abstract RecyclerView.LayoutManager getLayoutManager();
     protected abstract RecyclerView.ItemDecoration getItemDecoration();
@@ -46,7 +48,7 @@ public abstract class EditContactsFragment extends Fragment implements AdapterVi
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.view_editcontact_recycler, container, false);
 
-        mList = (RecyclerView) rootView.findViewById(R.id.contact_list);
+        mList = (RecyclerView) rootView.findViewById(R.id.editcontact_list);
         mList.setLayoutManager(getLayoutManager());
         mList.addItemDecoration(getItemDecoration());
 
@@ -59,8 +61,8 @@ public abstract class EditContactsFragment extends Fragment implements AdapterVi
         db = Storage.getInstance(context);
 
         mAdapter = getAdapter();
-        mAdapter.setOnItemClickListener(this);
         mList.setAdapter(mAdapter);
+        mAdapter.setOnItemClickListener(this);
 
         return rootView;
     }
@@ -83,6 +85,14 @@ public abstract class EditContactsFragment extends Fragment implements AdapterVi
                 Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mAdapter.AddContacts(db.getContacts());
+    }
+
+
+
       /**
      * Created by ursow on 19/05/15.
      */
@@ -104,8 +114,9 @@ public abstract class EditContactsFragment extends Fragment implements AdapterVi
 
         @Override
         public void onBindViewHolder(final ClipCardViewHolder clipCardViewHolder, int i) {
-            final ContactObject contactObject = contactObjectList.get(i);
+            contactObject = contactObjectList.get(i);
 
+            clipCardViewHolder.vEmail.setText(contactObject.getEmail() );
             clipCardViewHolder.vContact.setText(contactObject.getName());
             if ( contactObject.getPhotoPath() == null ) {
                 clipCardViewHolder.vBagde.setImageResource(R.drawable.avatar_empty);
@@ -113,58 +124,38 @@ public abstract class EditContactsFragment extends Fragment implements AdapterVi
             else {
                 clipCardViewHolder.vBagde.setImageURI(Uri.parse(contactObject.getPhotoPath()));
             }
-
-            if ( contactObject.IsChoosed() ) {
-                clipCardViewHolder.vCheckUser.setVisibility(View.VISIBLE);
-            }
-            else {
-                clipCardViewHolder.vCheckUser.setVisibility(View.INVISIBLE);
-            }
-
+            clipCardViewHolder.vAmount.setText( String.valueOf( contactObject.getAmount() ) );
+            clipCardViewHolder.vPeriod.setText( contactObject.getPeriod() );
             clipCardViewHolder.vBagde.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
-                    if (contactObject.IsChoosed()) {
-                        clipCardViewHolder.vCheckUser.setVisibility(View.INVISIBLE);
-                        contactObject.setUnChoosed();
-                        db.deleteContact(contactObject.getGoogleId());
+                    Intent i = new Intent(getActivity(), ActivityEditor.class)
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            .putExtra("period", clipCardViewHolder.vPeriod.getText())
+                            .putExtra("id", contactObjectList.get(clipCardViewHolder.getAdapterPosition()).getGoogleId())
+                            .putExtra("amount", clipCardViewHolder.vAmount.getText()
+                            );
+                    startActivity(i);
 
-                    } else {
-                        db.addContact(contactObject);
-                        clipCardViewHolder.vCheckUser.setVisibility(View.VISIBLE);
-                        contactObject.setChoosed();
-                    }
                 }
             });
-
-            clipCardViewHolder.vCheckUser.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    if (contactObject.IsChoosed()) {
-                        clipCardViewHolder.vCheckUser.setVisibility(View.INVISIBLE);
-                        contactObject.setUnChoosed();
-                        db.deleteContact(contactObject.getGoogleId());
-
-                    } else {
-                        // db.addContact(contactObject);
-                        clipCardViewHolder.vCheckUser.setVisibility(View.VISIBLE);
-                        contactObject.setChoosed();
-                    }
-                }
-            });
-
 
             //setAnimation(clipCardViewHolder.vMain, i);
 
         }
+          public void AddContacts(final List<ContactObject> NewContacts) {
+              if ( !NewContacts.isEmpty() ) {
+                  contactObjectList = NewContacts;
+                  notifyDataSetChanged();
+              }
+          }
 
         @Override
         public ClipCardViewHolder onCreateViewHolder( ViewGroup viewGroup, int i) {
             View itemView = LayoutInflater.
                     from(viewGroup.getContext()).
-                    inflate(R.layout.activity_contact_card, viewGroup, false);
+                    inflate(R.layout.activity_editcontact_card, viewGroup, false);
 
             return new ClipCardViewHolder(itemView);
         }
@@ -174,13 +165,19 @@ public abstract class EditContactsFragment extends Fragment implements AdapterVi
             protected TextView vContact;
             protected QuickContactBadge vBagde;
             protected QuickContactBadge vCheckUser;
+            protected TextView vEmail;
             protected View vMain;
+            protected TextView vPeriod;
+            protected TextView vAmount;
 
             public ClipCardViewHolder(View v) {
                 super(v);
-                vContact = (TextView) v.findViewById(R.id.contact_name);
+                vContact = (TextView) v.findViewById(R.id.contacts_names);
+                vPeriod = (TextView) v.findViewById(R.id.text_period);
+                vAmount = (TextView) v.findViewById(R.id.text_amount);
+                vEmail = (TextView) v.findViewById(R.id.text_contact_email);
                 vBagde = (QuickContactBadge) v.findViewById(R.id.photo_contact);
-                vCheckUser = (QuickContactBadge) v.findViewById(R.id.checkImageView);
+
                 vMain = v;
             }
         }

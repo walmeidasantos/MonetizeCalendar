@@ -1,8 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.catchingnow.tinyclipboardmanager.ActivityEditor"
-    android:layout_width="match_parent"
+   android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <ScrollView
@@ -11,39 +8,25 @@
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:background="@color/background"
         android:fillViewport="true"
         android:layout_centerHorizontal="true"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+
+        >
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textMultiLine"
-                android:ems="10"
-                android:text="Test text text"
-                android:minLines="3"
-                android:paddingTop="10dp"
-                android:paddingBottom="40dp"
-                android:paddingLeft="@dimen/abc_dropdownitem_text_padding_left"
-                android:paddingRight="@dimen/abc_dropdownitem_text_padding_right"
-                android:id="@+id/edit_text"
-                android:background="@null"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true" />
+            android:layout_height="wrap_content"
+            android:id="@+id/description"
+            android:theme="@style/Base.Theme.AppCompat.Light">
 
             <View
                 android:id="@+id/divider"
                 android:layout_width="fill_parent"
                 android:layout_height="1dp"
                 android:layout_alignParentBottom="true"
-                android:layout_marginBottom="40dp"
-                android:background="@color/accent" />
+                android:layout_marginBottom="40dp"/>
 
             <ImageButton
                 android:id="@+id/main_fab"
@@ -58,7 +41,78 @@
                 android:padding="8dp"
                 android:src="@drawable/ic_action_save"
                 android:scaleType="centerInside"
-                android:onClick="saveTextOnClick" />
+ />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/editText"
+                android:text="@string/periodic_charge"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                />
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/editText"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:showDividers="beginning|end"
+                android:id="@+id/radioGroup"
+                >
+                <RadioButton
+                    android:id="@+id/radioMonthly"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/montly"
+                    android:checked="true" />
+                <RadioButton
+                    android:id="@+id/radioWeekly"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/weekly"
+                    android:checked="true"  />
+
+                <RadioButton
+                    android:id="@+id/radioPerClass"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/per_class"
+                    android:checked="true"   />
+
+                <RadioButton
+                    android:id="@+id/radioPerHour"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/per_hour"
+                    android:checked="true"
+                     />
+
+            </RadioGroup>
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/description2"
+                android:text="Amount of charge"
+                android:layout_below="@+id/radioGroup"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/amount"
+                android:text="0.00"
+                android:editable="true"
+                android:layout_below="@+id/radioGroup"
+                android:layout_toRightOf="@+id/editText"
+                android:layout_toEndOf="@+id/editText"
+                android:inputType="numberDecimal"
+                android:contentDescription="Put the value to charge" />
 
         </RelativeLayout>
     </ScrollView>

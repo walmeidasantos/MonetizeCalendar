@@ -36,6 +36,8 @@ public class Storage {
     public static final String CONTACT_NAME = "name";
     public static final String CONTACT_EMAIL = "email";
     public static final String CONTACT_PHOTO = "photo";
+    public static final String CONTACT_CHARGE = "charge";
+    public static final String CONTACT_PERIOD = "period";
 
     public static final int CONTACT_ACTIVE = 0;
     public static final int CONTACT_INACTIVE = 1;
@@ -324,7 +326,7 @@ public class Storage {
 
             String sortOrder = CONTACT_NAME + " ASC ";
 
-            String[] COLUMNS_CONTACTS = {CONTACT_GOOGLEID, CONTACT_NAME, CONTACT_EMAIL, CONTACT_STATUS,CONTACT_PHOTO };
+            String[] COLUMNS_CONTACTS = {CONTACT_GOOGLEID, CONTACT_NAME, CONTACT_EMAIL, CONTACT_STATUS,CONTACT_PHOTO,CONTACT_PERIOD,CONTACT_CHARGE };
 
             Cursor cursor_Contacts;
 
@@ -341,11 +343,13 @@ public class Storage {
 
                 ContactsInMemory.add(
                         new ContactObject(
-                                cursor_Contacts.getString(0),
-                                cursor_Contacts.getString(1),
-                                cursor_Contacts.getString(2),
+                                cursor_Contacts.getString(0), //googleId
+                                cursor_Contacts.getString(1), //name
+                                cursor_Contacts.getString(2), //email
                                 null,//left disable the status
-                                cursor_Contacts.getString(4)
+                                cursor_Contacts.getString(4), //photoPath
+                                cursor_Contacts.getLong(6), //amount
+                                cursor_Contacts.getString(5)//period
                         )
                 );
 
@@ -392,20 +396,27 @@ public class Storage {
             addEvent(eventObject);
         }
         close();
-        latsUpdate = new Date();
         isEventInMemoryChanged = true;
     }
 
-   public void modifyClip(Integer oldEvent, Integer newEvent ) {
-        //Log.v(MyUtil.PACKAGE_NAME, "modifyClip(" + oldEvent + ", " + newEvent + ", " + isImportant + ")");
+   public void modifyContact( String GoogleId,String period, long amount ) {
 
-        open();
-        //TODO fazer a alteração do evento caso seja necessário
-        close();
-        latsUpdate = new Date();
-        isEventInMemoryChanged = true;
+       open();
+       isContactInMemoryChanged = true;
+       ContentValues ContactValues = new ContentValues();
 
-        //refreshAllEventsList(!newEvent.isEmpty(), oldEvent);
+       ContactValues.put(CONTACT_CHARGE, amount);
+       ContactValues.put(CONTACT_PERIOD, period);
+
+       String whereClause = CONTACT_GOOGLEID + " = ?";
+
+       db.update(TABLE_CONTACTS,
+               ContactValues,
+               whereClause,
+               new String[]{ String.valueOf(GoogleId) });
+
+       getContacts();
+       close();
 
     }
 
@@ -422,43 +433,5 @@ public class Storage {
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
-    public Date getLatsUpdateDate() {
-        return latsUpdate;
-    }
 
-
-    public boolean updateDb() {
-
-        //sync system clipboard and storage.
-
-        String topClipInStack;
-        if (getEvents().size() > 0) {
-            topClipInStack = getEvents().get(0).getSumary();
-        } else {
-            topClipInStack = "";
-        }
-
-        String clipString;
-        if (!eventClipboardManager.hasPrimaryClip()) {
-            eventClipboardManager.setText(topClipInStack);
-            return true;
-        }
-        try {
-            //Don't use CharSequence .toString()!
-            CharSequence charSequence = eventClipboardManager.getPrimaryClip().getItemAt(0).getText();
-            clipString = String.valueOf(charSequence);
-        } catch (Error ignored) {
-            eventClipboardManager.setText(topClipInStack);
-            return true;
-        }
-
-        if (!topClipInStack.equals(clipString)) {
-            eventClipboardManager.setText(topClipInStack);
-            return true;
-        }
-        return false;
-    }
-
-
-
-}
+ }

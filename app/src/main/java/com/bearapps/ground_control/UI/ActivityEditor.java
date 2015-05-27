@@ -1,42 +1,88 @@
 package com.bearapps.ground_control.UI;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.bearapps.ground_control.R;
 import com.bearapps.ground_control.utility.Storage;
 
 
-public class ActivityEditor extends Activity {
+public class ActivityEditor extends ActionBarActivity {
 
-    private String oldText;
-    private EditText editText;
+    private EditText TextAmount;
     private ImageButton mFAB;
     private InputMethodManager inputMethodManager;
     private Storage db;
+    private Toolbar mToolbar;
+    private RadioGroup period;
+    private String IdContact;
+    private long amount;
+    private String TextPeriod;
+    private RadioButton radio_Monthly;
+    private RadioButton radio_Weekly;
+    private RadioButton radio_perclass;
+    private RadioButton radio_perhour;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_editor);
+
         Intent intent = getIntent();
-        oldText = intent.getStringExtra(Intent.EXTRA_TEXT);
-        if (oldText == null || oldText.equals(getString(R.string.clip_notification_single_text))) {
-            oldText = "";
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        period = (RadioGroup) findViewById(R.id.radioGroup);
+        radio_Monthly = (RadioButton) findViewById(R.id.radioMonthly);
+        radio_Weekly = (RadioButton) findViewById(R.id.radioWeekly);
+        radio_perclass = (RadioButton) findViewById(R.id.radioPerClass);
+        radio_perhour = (RadioButton) findViewById(R.id.radioPerHour);
+
+        IdContact = intent.getStringExtra("id");
+        amount = Long.parseLong( intent.getStringExtra("amount") ) ;
+        TextPeriod = intent.getStringExtra("period");
+
+        if (TextPeriod.equals(radio_Monthly.getText()) ) {
+            radio_Monthly.setChecked(true);
         }
 
-        editText = (EditText) findViewById(R.id.edit_text);
-        mFAB = (ImageButton) findViewById(R.id.main_fab);
+        if (TextPeriod.equals(radio_Weekly.getText()) ) {
+            radio_Weekly.setChecked(true);
+        }
 
-        editText.setText(oldText);
-        editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        if (TextPeriod.equals(radio_perclass.getText()) ) {
+            radio_perclass.setChecked(true);
+        }
+
+        if (TextPeriod.equals(radio_perhour.getText()) ) {
+            radio_perhour.setChecked(true);
+        }
+
+        TextAmount = (EditText) findViewById(R.id.amount);
+        mFAB = (ImageButton) findViewById(R.id.main_fab);
+        mFAB.setOnClickListener(
+                new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        // TODO Auto-generated method stub
+                        saveTextOnClick(v);
+                    }
+                });
+
+        TextAmount.setText(String.valueOf(amount));
+        TextAmount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
@@ -47,44 +93,58 @@ public class ActivityEditor extends Activity {
         });
 
         db = Storage.getInstance(this);
-        // if is copied form other application.
-        if (Intent.ACTION_SEND.equals(intent.getAction()) && "text/plain".equals(intent.getType())) {
-            oldText = "";
-        }
 
-        String titleText = getString(R.string.title_activity_activity_editor);
-        if (oldText.isEmpty()) {
-            titleText = getString(R.string.title_activity_editor);
+    }
+
+
+
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        editText.requestFocus();
+        TextAmount.requestFocus();
     }
 
     @Override
     public void onPause() {
         super.onPause();
         inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+        inputMethodManager.hideSoftInputFromWindow(TextAmount.getWindowToken(), 0);
     }
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         finishAndRemoveTaskWithToast(getString(R.string.toast_no_saved));
     }
 
     private void saveText() {
-        String newText = editText.getText().toString();
+        String newText = TextAmount.getText().toString();
         String toastMessage;
-        //db.modifyClip(oldText, newText, (isStarred ? 1 : -1));
-        if (newText != null && !newText.isEmpty()) {
-            toastMessage = getString(R.string.toast_copied, newText + "\n");
-        } else {
-            toastMessage = getString(R.string.toast_deleted);
+
+        if (period.getCheckedRadioButtonId() == -1 ) {
+
+        }else {
+            int selectedId = period.getCheckedRadioButtonId();
+            // find the radiobutton by returned id
+            RadioButton selectedRadioButton = (RadioButton)findViewById(selectedId);
+            TextPeriod = selectedRadioButton.getText().toString();
         }
+        amount = Long.parseLong(TextAmount.getText().toString()) ;
+        db.modifyContact(IdContact,TextPeriod,amount);
+        toastMessage = getString(R.string.toast_copied, newText + "\n");
         finishAndRemoveTaskWithToast(toastMessage);
     }
 

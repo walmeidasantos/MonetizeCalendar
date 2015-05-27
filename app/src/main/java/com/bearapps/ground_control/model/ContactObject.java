@@ -12,6 +12,8 @@ public class ContactObject {
     protected String status;
     protected String photoPath;
     protected Boolean choosed = false;
+    protected long amount = 0;
+    protected String period;
 
     public ContactObject(String googleid, String name, String email,String Status ) {
         this.googleidId = googleid;
@@ -30,6 +32,19 @@ public class ContactObject {
 
     }
 
+    public ContactObject(String googleid, String name, String email,String Status, String photoPath,long amount,String period ) {
+        this.googleidId = googleid;
+        this.name = name;
+        this.email = email;
+        this.status = Status;
+        this.photoPath = photoPath;
+        this.period = period;
+        this.amount = amount;
+
+    }
+
+
+
     public String getGoogleId() {
         return googleidId;
     }
@@ -42,6 +57,22 @@ public class ContactObject {
     public void setChoosed() { this.choosed = true; return ;}
     public Boolean IsChoosed() { return this.choosed; }
     public void setUnChoosed() { this.choosed = false; return ;}
+    public long getAmount() {return this.amount;}
+    public String getPeriod() {
+        if (this.period == null) {
+            this.period = "Monthly";
+        }
 
+        return this.period;
+
+    }
+
+    public void SetPeriod(String period) {
+        this.period = period;
+    }
+
+    public void SetAmount(long amount) {
+        this.amount = amount;
+    }
 }
 
