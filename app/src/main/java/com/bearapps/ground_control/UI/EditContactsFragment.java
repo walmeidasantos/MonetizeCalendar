@@ -174,7 +174,7 @@ public abstract class EditContactsFragment extends Fragment implements AdapterVi
                 super(v);
                 vContact = (TextView) v.findViewById(R.id.contacts_names);
                 vPeriod = (TextView) v.findViewById(R.id.text_period);
-                vAmount = (TextView) v.findViewById(R.id.text_amount);
+                vAmount = (TextView) v.findViewById(R.id.text_invoicevalue);
                 vEmail = (TextView) v.findViewById(R.id.text_contact_email);
                 vBagde = (QuickContactBadge) v.findViewById(R.id.photo_contact);
 

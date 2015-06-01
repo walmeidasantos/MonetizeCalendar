@@ -13,6 +13,7 @@ import android.util.Log;
 import com.bearapps.ground_control.R;
 import com.bearapps.ground_control.model.ContactObject;
 import com.bearapps.ground_control.model.EventObject;
+import com.bearapps.ground_control.model.InvoiceObject;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.EventDateTime;
 
@@ -130,14 +131,29 @@ public class Storage {
     }
 
     public List<EventObject> getEvents() {
-        String[] whereParam = {String.valueOf(EVENT_DECISION) };
-        String whereClause = EVENTS_STATUS + " = ? " ;
+        return getEvents(null);
+    }
+
+
+    public List<EventObject> getEvents(ContactObject contact) {
+
+        String[] whereParam;
+        String whereClause;
+
+        if ( contact == null ) {
+            whereParam = new String[] {String.valueOf(EVENT_DECISION) };
+            whereClause = EVENTS_STATUS + " = ? " ;
+        }
+        else {
+            whereParam = new String[] {String.valueOf(EVENT_DECISION), String.valueOf( contact.getId() ) };
+            whereClause = EVENTS_STATUS + " = ? AND " + CONTACT_ID + " = ? " ;
+        }
 
         List<Integer> contactsid = null;
         if (isEventInMemoryChanged) {
             open();
 
-            String sortOrder = EVENTS_DTINC + " ASC ";
+            String sortOrder = EVENTS_BEGINEVENT + " ASC ";
 
             String[] COLUMNS_EVENTS = {EVENTS_GOOGLEID, EVENTS_SUMARY, EVENTS_BEGINEVENT, EVENTS_ENDEVENT, EVENTS_WHERE, CONTACT_EMAIL, EVENTS_ID, CONTACT_NAME};
             Cursor cursor_events;
@@ -150,15 +166,15 @@ public class Storage {
                     null,//having
                     sortOrder);//orderby
 
-            String googleidStorage = "";
-
             EventsInMemory = new ArrayList<>();
             while (cursor_events.moveToNext()) {
 
                     EventDateTime BeginDate = new EventDateTime();
                     BeginDate.setDateTime(new DateTime(cursor_events.getLong(2)));
+                    BeginDate.setTimeZone( TimeZone.getDefault().getID());
 
                     EventDateTime EndDate = new EventDateTime();
+                    EndDate.setTimeZone( TimeZone.getDefault().getID());
                     EndDate.setDateTime(new DateTime(cursor_events.getLong(3)));
 
                     EventsInMemory.add(
@@ -245,8 +261,8 @@ public class Storage {
         EventsValues.put(EVENTS_GOOGLEID, eventObject.getGoogleId());
         EventsValues.put(EVENTS_SUMARY, eventObject.getSumary() );
         EventsValues.put(EVENTS_WHERE, eventObject.getWhere());
-        EventsValues.put(EVENTS_BEGINEVENT, eventObject.getBeginEvent().getValue()  );
-        EventsValues.put(EVENTS_ENDEVENT, eventObject.getEndEvent().getValue()  );
+        EventsValues.put(EVENTS_BEGINEVENT, eventObject.getBeginEvent().getDateTime().getValue()  );
+        EventsValues.put(EVENTS_ENDEVENT, eventObject.getEndEvent().getDateTime().getValue()  );
 
         db.beginTransaction();
 
@@ -419,6 +435,19 @@ public class Storage {
        close();
 
     }
+
+    public List<InvoiceObject> getInvoice() {
+        List<InvoiceObject> invoices = new ArrayList<>();
+
+        return invoices;
+    }
+
+
+    public void importInvoice(List<InvoiceObject> newInvoices) {
+
+    }
+
+
 
     public static void updateDbBroadcast(Context context, Boolean added, String deletedString) {
         Intent intent = new Intent(UPDATE_DB);

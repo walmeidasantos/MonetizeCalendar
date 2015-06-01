@@ -1,6 +1,5 @@
 package com.bearapps.ground_control.model;
 
-import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.EventDateTime;
 
 import java.text.SimpleDateFormat;
@@ -58,11 +57,11 @@ public class EventObject {
         String result = time.format( new Date(BeginEvent.getDateTime().getValue()) );
 
         return result; }
-    public DateTime getBeginEvent() {
-        DateTime result = BeginEvent.getDateTime();
+    public EventDateTime getBeginEvent() {
+        EventDateTime result = BeginEvent;
         return result ; }
-    public DateTime getEndEvent() {
-        DateTime result = EndEvent.getDateTime();
+    public EventDateTime getEndEvent() {
+        EventDateTime result = EndEvent;
         return result ; }
     public String getWhere() { return where;}
     public String getSumary() { return sumary;  }

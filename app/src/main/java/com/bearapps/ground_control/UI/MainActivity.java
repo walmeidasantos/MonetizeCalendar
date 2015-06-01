@@ -87,6 +87,10 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
                 ft.replace(R.id.container, EditContactMainFragment.newInstance());
                 break;
 
+            case 3:
+                ft.replace(R.id.container, InvoiceMainFragment.newInstance());
+                break;
+
             default:
                 //Do nothing
                 break;

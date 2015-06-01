@@ -1,0 +1,37 @@
+package com.bearapps.ground_control.model;
+
+import java.util.Date;
+
+/**
+ * Created by ursow on 29/05/15.
+ */
+public class InvoiceObject {
+
+    protected Integer Id;
+    protected ContactObject contact;
+    protected long amount;
+    protected Date CreatedDate ;
+    protected String status = "1"; // 1=open , 2= close, 3=Cancel
+
+
+    public InvoiceObject(ContactObject contact, long amount, Date CreatedDate ) {
+        this.contact = contact;
+        this.CreatedDate = CreatedDate;
+        this.amount = amount;
+    }
+
+    public ContactObject getContact() {
+        return contact;
+    }
+    public void setId(int New_Id) { Id = New_Id;   }
+    public Integer getId() { return Id;}
+    public void setStatus(String newStatus) {
+        this.status = newStatus;
+        return; }
+    public String getStatus() { return status;}
+    public long getAmount() {return this.amount;}
+    public void SetAmount(long amount) {
+        this.amount = amount;
+    }
+}
+

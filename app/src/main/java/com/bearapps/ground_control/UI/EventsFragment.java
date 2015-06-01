@@ -293,7 +293,6 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                getActivity().setProgressBarIndeterminateVisibility(false);
                 if (eventObjects == null) {
 
                     Toast.makeText(
@@ -346,7 +345,7 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
         } else {
             if (isDeviceOnline()) {
                 getActivity().setProgressBarIndeterminateVisibility(true);
-                new EventFecthTask().execute();
+                new EventFetchTask().execute();
             } else {
                 Toast.makeText(
                         getActivity(),
@@ -433,7 +432,7 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
     }
 
 
-    private class EventFecthTask extends AsyncTask<Void, Void, Void> {
+    private class EventFetchTask extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -457,8 +456,6 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
             }
             return null;
         }
-
-
 
     }
 
@@ -535,5 +532,10 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
                         })
                 , getActivity());
     }
+
+
+
+
+
 
 }
