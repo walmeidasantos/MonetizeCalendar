@@ -20,6 +20,7 @@ public class EventObject {
     protected EventDateTime BeginEvent;
     protected EventDateTime EndEvent;
     protected String where;
+    protected int status;
 
     public EventObject(String googleid,String createtion_sumary,EventDateTime BeginEvent, EventDateTime EndEvent, String where, List Contacts ) {
         this.googleid = googleid;
@@ -63,6 +64,15 @@ public class EventObject {
     public EventDateTime getEndEvent() {
         EventDateTime result = EndEvent;
         return result ; }
+
+    public void setStatus(int newStatus) {
+        this.status = newStatus;
+    }
+
+    public int getStatus() {
+        return this.status;
+    }
+
     public String getWhere() { return where;}
     public String getSumary() { return sumary;  }
     public String getFirstContact() {

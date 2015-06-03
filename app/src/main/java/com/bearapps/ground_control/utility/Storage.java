@@ -58,6 +58,7 @@ public class Storage {
     public static final int EVENT_DECISION = 0;
     public static final int EVENT_CONCLUDED = 1;
     public static final int EVENT_CANCEL = 2;
+    public static final int EVENT_PAID = 3;
 
     public static final String TABLE_INVOICE = "invoice";
     public static final String INVOICE_STATUS = "status"; //0 = invoice open ; 1= invoice paid ; 2=invoice cancel
@@ -130,6 +131,9 @@ public class Storage {
         }
     }
 
+    public int InvoicePaidCode() {
+        return EVENT_PAID;
+    }
     public List<EventObject> getEvents() {
         return getEvents(null);
     }
@@ -139,13 +143,13 @@ public class Storage {
 
         String[] whereParam;
         String whereClause;
-
+        //case getting events for a contact get only events concluded
         if ( contact == null ) {
             whereParam = new String[] {String.valueOf(EVENT_DECISION) };
             whereClause = EVENTS_STATUS + " = ? " ;
         }
         else {
-            whereParam = new String[] {String.valueOf(EVENT_DECISION), String.valueOf( contact.getId() ) };
+            whereParam = new String[] {String.valueOf(EVENT_CONCLUDED), String.valueOf( contact.getId() ) };
             whereClause = EVENTS_STATUS + " = ? AND " + CONTACT_ID + " = ? " ;
         }
 

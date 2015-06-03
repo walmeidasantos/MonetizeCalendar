@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 
 public abstract class InvoiceFragment extends Fragment implements AdapterView.OnItemClickListener {
@@ -98,102 +99,17 @@ public abstract class InvoiceFragment extends Fragment implements AdapterView.On
         mAdapter.AddInvoice(db.getInvoice());
     }
 
-
-    /**
-     * Created by ursow on 19/05/15.
-     */
-    public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.ClipCardViewHolder> {
-        private List<InvoiceObject> invoiceObjects;
-        private boolean allowAnimate = true;
-        private AdapterView.OnItemClickListener mOnItemClickListener;
-
-        public InvoiceAdapter(List<InvoiceObject> Contacts) {
-
-            invoiceObjects = Contacts;
-            notifyDataSetChanged();
-
-        }
-
-        @Override
-        public int getItemCount() {
-            return invoiceObjects.size();
-        }
-
-        @Override
-        public void onBindViewHolder(final ClipCardViewHolder clipCardViewHolder, int i) {
-            InvoiceObject invoiceObject = invoiceObjects.get(i);
-
-            clipCardViewHolder.vEmail.setText(invoiceObject.getContact().getEmail());
-            clipCardViewHolder.vContact.setText(invoiceObject.getContact().getName());
-            if (invoiceObject.getContact().getPhotoPath() == null) {
-                clipCardViewHolder.vBagde.setImageResource(R.drawable.avatar_empty);
-            } else {
-                clipCardViewHolder.vBagde.setImageURI(Uri.parse(invoiceObject.getContact().getPhotoPath()));
-            }
-            clipCardViewHolder.vInvoiceValue.setText(String.valueOf(invoiceObject.getAmount()));
-            clipCardViewHolder.vInvoiceNumber.setText(String.valueOf(invoiceObject.getAmount()));
-            //setAnimation(clipCardViewHolder.vMain, i);
-
-        }
-
-        public void AddInvoice(final List<InvoiceObject> NewInvoices) {
-            if (!NewInvoices.isEmpty()) {
-                invoiceObjects = NewInvoices;
-                notifyDataSetChanged();
-            }
-        }
-
-        @Override
-        public ClipCardViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-            View itemView = LayoutInflater.
-                    from(viewGroup.getContext()).
-                    inflate(R.layout.activity_editcontact_card, viewGroup, false);
-
-            return new ClipCardViewHolder(itemView);
-        }
-
-
-        public class ClipCardViewHolder extends RecyclerView.ViewHolder {
-            protected TextView vContact;
-            protected QuickContactBadge vBagde;
-            protected QuickContactBadge vCheckUser;
-            protected TextView vEmail;
-            protected View vMain;
-            protected TextView vInvoiceNumber;
-            protected TextView vInvoiceValue;
-
-            public ClipCardViewHolder(View v) {
-                super(v);
-                vContact = (TextView) v.findViewById(R.id.contacts_names);
-                vInvoiceNumber = (TextView) v.findViewById(R.id.text_period);
-                vInvoiceValue = (TextView) v.findViewById(R.id.text_invoicevalue);
-                vEmail = (TextView) v.findViewById(R.id.text_contact_email);
-                vBagde = (QuickContactBadge) v.findViewById(R.id.photo_contact);
-
-                vMain = v;
-            }
-        }
-
-        public void setOnItemClickListener(AdapterView.OnItemClickListener onItemClickListener) {
-            mOnItemClickListener = onItemClickListener;
-        }
-
-
-    }
-
-
     private List<InvoiceObject> generateInvoice() {
 
         List<InvoiceObject> NewInvoices = new ArrayList<>();
         List<ContactObject> Contacts    = db.getContacts();
         List<EventObject> ContactEvents = new ArrayList<>();
 
-        final Calendar c = Calendar.getInstance();
-        int mYear = c.get(Calendar.YEAR);
-        int mMonth = c.get(Calendar.MONTH);
-        int mDay = c.get(Calendar.DAY_OF_MONTH);
-
-
+        final Calendar Cal = Calendar.getInstance();
+        Cal.setTimeZone( TimeZone.getDefault() );
+        int mYear = Cal.get(Calendar.YEAR);
+        int mMonth = Cal.get(Calendar.MONTH);
+        int mDay = Cal.get(Calendar.DAY_OF_MONTH);
 
         for (ContactObject Contact: Contacts) {
             ContactEvents = db.getEvents(Contact);
@@ -203,63 +119,124 @@ public abstract class InvoiceFragment extends Fragment implements AdapterView.On
 
                     if (ContactEvents.size() > 0 ) {
                         EventObject event = ContactEvents.get(0);
-
+                        InvoiceObject NewInvoice;
                         Date start = new Date( event.getBeginEvent().getDateTime().getValue() );
                         //case the first event of the contact is the current month ignore
                         if ( mMonth == start.getMonth() || mYear == start.getYear() ) {
-                            break;
+                            NewInvoice = new InvoiceObject(Contact,Contact.getAmount(), new Date() );
+                            NewInvoices.add(NewInvoice);
+                            ContactEvents.get(0).setStatus(db.InvoicePaidCode());
                         }
-                        InvoiceObject NewInvoice = new InvoiceObject(Contact,Contact.getAmount(), new Date() );
-                        NewInvoices.add(NewInvoice);
+
                         int lastMonth = start.getMonth();
                         for (int count = 1; count < ContactEvents.size(); count++) {
                             event = ContactEvents.get(count);
                             start = new Date( event.getBeginEvent().getDateTime().getValue() );
 
-                            if ( lastMonth == start.getMonth() || mYear == start.getYear() ) {
-                                break;
+                            if ( !(lastMonth == start.getMonth() || mYear == start.getYear()) ) {
+                                NewInvoice = new InvoiceObject(Contact,Contact.getAmount(), new Date() );
+                                NewInvoices.add(NewInvoice);
+                                ContactEvents.get(0).setStatus(db.InvoicePaidCode());
+                                start = new Date( event.getBeginEvent().getDateTime().getValue() );
+                                lastMonth = start.getMonth();
+
+
                             }
-                            NewInvoice = new InvoiceObject(Contact,Contact.getAmount(), new Date() );
-                            NewInvoices.add(NewInvoice);
-
                         }
-
-
-
                     }
 
 
                 case "Weekly":
                     if (ContactEvents.size() > 0 ) {
                         EventObject event = ContactEvents.get(0);
-
+                        InvoiceObject NewInvoice;
                         Date start = new Date( event.getBeginEvent().getDateTime().getValue() );
                         //case the first event of the contact is the current month ignore
                         if ( mMonth == start.getMonth() || mYear == start.getYear() ) {
-                            break;
+                            NewInvoice = new InvoiceObject(Contact,Contact.getAmount(), new Date() );
+                            NewInvoices.add(NewInvoice);
+                            ContactEvents.get(0).setStatus(db.InvoicePaidCode());
                         }
-                        InvoiceObject NewInvoice = new InvoiceObject(Contact,Contact.getAmount(), new Date() );
-                        NewInvoices.add(NewInvoice);
+
+                        int lastMonth = start.getMonth();
+                        Cal.setTime(start);
+                        int lastWeek = Cal.get(Calendar.WEEK_OF_MONTH);
+
+                        for (int count = 1; count < ContactEvents.size(); count++) {
+                            event = ContactEvents.get(count);
+                            start = new Date( event.getBeginEvent().getDateTime().getValue() );
+
+                            if ( !(lastMonth == start.getMonth() || mYear == start.getYear() || lastWeek == Cal.get(Calendar.WEEK_OF_MONTH) ) ) {
+                                NewInvoice = new InvoiceObject(Contact,Contact.getAmount(), new Date() );
+                                NewInvoices.add(NewInvoice);
+                                start = new Date( event.getBeginEvent().getDateTime().getValue() );
+                                lastMonth = start.getMonth();
+                                Cal.setTime(start);
+                                lastWeek = Cal.get(Calendar.WEEK_OF_MONTH);
+                            }
+
+
+                        }
+
+                    }
+
+                case "Per class":
+
+
+                    if (ContactEvents.size() > 0 ) {
+                        EventObject event = ContactEvents.get(0);
+                        InvoiceObject NewInvoice;
+                        Date start = new Date( event.getBeginEvent().getDateTime().getValue() );
+                        //case the first event of the contact is the current month ignore
+                        if ( mMonth == start.getMonth() || mYear == start.getYear() ) {
+                            NewInvoice = new InvoiceObject(Contact,Contact.getAmount(), new Date() );
+                            NewInvoices.add(NewInvoice);
+                            ContactEvents.get(0).setStatus(db.InvoicePaidCode());
+                        }
+
                         int lastMonth = start.getMonth();
                         for (int count = 1; count < ContactEvents.size(); count++) {
                             event = ContactEvents.get(count);
                             start = new Date( event.getBeginEvent().getDateTime().getValue() );
 
-                            if ( lastMonth == start.getMonth() || mYear == start.getYear() ) {
-                                break;
+                            if ( !(lastMonth == start.getMonth() || mYear == start.getYear()) ) {
+                                NewInvoice = new InvoiceObject(Contact,Contact.getAmount(), new Date() );
+                                NewInvoices.add(NewInvoice);
+                                ContactEvents.get(0).setStatus(db.InvoicePaidCode());
+                                start = new Date( event.getBeginEvent().getDateTime().getValue() );
+                                lastMonth = start.getMonth();
+
+
                             }
-                            NewInvoice = new InvoiceObject(Contact,Contact.getAmount(), new Date() );
-                            NewInvoices.add(NewInvoice);
-
                         }
-
-
-
                     }
 
-                case "Per class":
                 case "Per Hour":
+                    if (ContactEvents.size() > 0 ) {
+                        EventObject event = ContactEvents.get(0);
+                        InvoiceObject NewInvoice;
 
+                        Date start = new Date( event.getBeginEvent().getDateTime().getValue() );
+                        Date end   = new Date( event.getEndEvent().getDateTime().getValue() );
+
+                        Date diff = new Date( end.getTime() - start.getTime() );
+                        Cal.setTime( diff );
+                        int hours = Cal.get(Calendar.HOUR_OF_DAY);
+                        int lastMonth = start.getMonth();
+
+                        for (int count = 1; count < ContactEvents.size(); count++) {
+                            event = ContactEvents.get(count);
+
+                            if ( (lastMonth == start.getMonth() || mYear == start.getYear()) ) {
+                                NewInvoice = new InvoiceObject(Contact,Contact.getAmount(), new Date() );
+                                NewInvoices.add(NewInvoice);
+                                ContactEvents.get(0).setStatus(db.InvoicePaidCode());
+                                start = new Date( event.getBeginEvent().getDateTime().getValue() );
+                                lastMonth = start.getMonth();
+
+                            }
+                        }
+                    }
             }
         }
 
@@ -314,6 +291,87 @@ public abstract class InvoiceFragment extends Fragment implements AdapterView.On
                 ).show();
             }
         });
+    }
+
+    /**
+     * Created by ursow on 19/05/15.
+     */
+    public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.ClipCardViewHolder> {
+        private List<InvoiceObject> invoiceObjects;
+        private boolean allowAnimate = true;
+        private AdapterView.OnItemClickListener mOnItemClickListener;
+
+        public InvoiceAdapter(List<InvoiceObject> Contacts) {
+
+            invoiceObjects = Contacts;
+            notifyDataSetChanged();
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return invoiceObjects.size();
+        }
+
+        @Override
+        public void onBindViewHolder(final ClipCardViewHolder clipCardViewHolder, int i) {
+            InvoiceObject invoiceObject = invoiceObjects.get(i);
+
+            clipCardViewHolder.vEmail.setText(invoiceObject.getContact().getEmail());
+            clipCardViewHolder.vContact.setText(invoiceObject.getContact().getName());
+            if (invoiceObject.getContact().getPhotoPath() == null) {
+                clipCardViewHolder.vBagde.setImageResource(R.drawable.avatar_empty);
+            } else {
+                clipCardViewHolder.vBagde.setImageURI(Uri.parse(invoiceObject.getContact().getPhotoPath()));
+            }
+            clipCardViewHolder.vInvoiceValue.setText(String.valueOf(invoiceObject.getAmount()));
+            clipCardViewHolder.vInvoiceNumber.setText(String.valueOf(invoiceObject.getAmount()));
+
+
+        }
+
+        public void AddInvoice(final List<InvoiceObject> NewInvoices) {
+            if (!NewInvoices.isEmpty()) {
+                invoiceObjects = NewInvoices;
+                notifyDataSetChanged();
+            }
+        }
+
+        @Override
+        public ClipCardViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+            View itemView = LayoutInflater.
+                    from(viewGroup.getContext()).
+                    inflate(R.layout.activity_editcontact_card, viewGroup, false);
+
+            return new ClipCardViewHolder(itemView);
+        }
+
+        public void setOnItemClickListener(AdapterView.OnItemClickListener onItemClickListener) {
+            mOnItemClickListener = onItemClickListener;
+        }
+
+        public class ClipCardViewHolder extends RecyclerView.ViewHolder {
+            protected TextView vContact;
+            protected QuickContactBadge vBagde;
+            protected QuickContactBadge vCheckUser;
+            protected TextView vEmail;
+            protected View vMain;
+            protected TextView vInvoiceNumber;
+            protected TextView vInvoiceValue;
+
+            public ClipCardViewHolder(View v) {
+                super(v);
+                vContact = (TextView) v.findViewById(R.id.contacts_names);
+                vInvoiceNumber = (TextView) v.findViewById(R.id.text_period);
+                vInvoiceValue = (TextView) v.findViewById(R.id.text_invoicevalue);
+                vEmail = (TextView) v.findViewById(R.id.text_contact_email);
+                vBagde = (QuickContactBadge) v.findViewById(R.id.photo_contact);
+
+                vMain = v;
+            }
+        }
+
+
     }
 
     public class InvoiceFecthTask extends AsyncTask<Void, Void, Void> {
