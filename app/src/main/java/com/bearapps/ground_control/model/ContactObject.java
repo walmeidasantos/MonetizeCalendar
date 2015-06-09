@@ -1,5 +1,7 @@
 package com.bearapps.ground_control.model;
 
+import com.bearapps.ground_control.utility.Storage;
+
 /**
  * Created by ursow on 15/4/24.
  */
@@ -14,14 +16,6 @@ public class ContactObject {
     protected Boolean choosed = false;
     protected long amount = 0;
     protected String period;
-
-    public ContactObject(String googleid, String name, String email,String Status ) {
-        this.googleidId = googleid;
-        this.name = name;
-        this.email = email;
-        this.status = Status;
-
-    }
 
     public ContactObject(String googleid, String name, String email,String Status, String photoPath ) {
         this.googleidId = googleid;
@@ -43,8 +37,6 @@ public class ContactObject {
 
     }
 
-
-
     public String getGoogleId() {
         return googleidId;
     }
@@ -60,19 +52,12 @@ public class ContactObject {
     public long getAmount() {return this.amount;}
     public String getPeriod() {
         if (this.period == null) {
-            this.period = "Monthly";
+            this.period = Storage.CHR_TYPE_MONTHLY;
         }
 
         return this.period;
 
     }
 
-    public void SetPeriod(String period) {
-        this.period = period;
-    }
-
-    public void SetAmount(long amount) {
-        this.amount = amount;
-    }
 }
 

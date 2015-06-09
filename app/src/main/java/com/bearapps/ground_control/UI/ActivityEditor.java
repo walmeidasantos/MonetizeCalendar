@@ -140,11 +140,19 @@ public class ActivityEditor extends ActionBarActivity {
             int selectedId = period.getCheckedRadioButtonId();
             // find the radiobutton by returned id
             RadioButton selectedRadioButton = (RadioButton)findViewById(selectedId);
-            TextPeriod = selectedRadioButton.getText().toString();
+            if (selectedRadioButton.getId() == 0) {
+                TextPeriod = Storage.CHR_TYPE_MONTHLY;
+            } else if (selectedRadioButton.getId() == 1) {
+                TextPeriod = Storage.CHR_TYPE_WEEKLY;
+            } else if (selectedRadioButton.getId() == 2) {
+                TextPeriod = Storage.CHR_TYPE_PERCLASS;
+            } else if (selectedRadioButton.getId() == 3) {
+                TextPeriod = Storage.CHR_TYPE_PERHOUR;
+            }
         }
         amount = Long.parseLong(TextAmount.getText().toString()) ;
         db.modifyContact(IdContact,TextPeriod,amount);
-        toastMessage = getString(R.string.toast_copied, newText + "\n");
+        toastMessage = getString(R.string.action_save, newText + "\n");
         finishAndRemoveTaskWithToast(toastMessage);
     }
 

@@ -105,135 +105,133 @@ public abstract class InvoiceFragment extends Fragment implements AdapterView.On
         List<ContactObject> Contacts    = db.getContacts();
         List<EventObject> ContactEvents = new ArrayList<>();
 
-        final Calendar Cal = Calendar.getInstance();
+        Calendar Cal = Calendar.getInstance();
         Cal.setTimeZone( TimeZone.getDefault() );
-        int mYear = Cal.get(Calendar.YEAR);
-        int mMonth = Cal.get(Calendar.MONTH);
-        int mDay = Cal.get(Calendar.DAY_OF_MONTH);
+        int mYear = Cal.get(Calendar.YEAR); //actual year
+        int mMonth = Cal.get(Calendar.MONTH);//actual month
+        int mWeek = Cal.get(Calendar.WEEK_OF_MONTH);//actual day
 
         for (ContactObject Contact: Contacts) {
             ContactEvents = db.getEvents(Contact);
-            switch ( Contact.getPeriod() ) {
-
-                case "Monthly":
-
-                    if (ContactEvents.size() > 0 ) {
-                        EventObject event = ContactEvents.get(0);
-                        InvoiceObject NewInvoice;
-                        Date start = new Date( event.getBeginEvent().getDateTime().getValue() );
-                        //case the first event of the contact is the current month ignore
-                        if ( mMonth == start.getMonth() || mYear == start.getYear() ) {
-                            NewInvoice = new InvoiceObject(Contact,Contact.getAmount(), new Date() );
-                            NewInvoices.add(NewInvoice);
-                            ContactEvents.get(0).setStatus(db.InvoicePaidCode());
-                        }
+            if ( Contact.getPeriod().equals(db.CHR_TYPE_MONTHLY) ) {
+                if (ContactEvents.size() > 0) {
+                    EventObject event = ContactEvents.get(0);
+                    InvoiceObject NewInvoice;
+                    Date start = new Date(event.getBeginEvent().getDateTime().getValue());
+                    //case the first event of the contact is the current month ignore
+                    if (mMonth == start.getMonth() || mYear == start.getYear()) {
+                        NewInvoice = new InvoiceObject(Contact, Contact.getAmount(), new Date());
+                        NewInvoices.add(NewInvoice);
+                        ContactEvents.get(0).setStatus(db.InvoicePaidCode());
+                        int actualMonth = start.getMonth();
 
                         int lastMonth = start.getMonth();
                         for (int count = 1; count < ContactEvents.size(); count++) {
                             event = ContactEvents.get(count);
-                            start = new Date( event.getBeginEvent().getDateTime().getValue() );
+                            start = new Date(event.getBeginEvent().getDateTime().getValue());
+                            lastMonth = start.getMonth();
 
-                            if ( !(lastMonth == start.getMonth() || mYear == start.getYear()) ) {
-                                NewInvoice = new InvoiceObject(Contact,Contact.getAmount(), new Date() );
+                            if (!(lastMonth == start.getMonth() || mYear == start.getYear()) || actualMonth != lastMonth) {
+                                NewInvoice = new InvoiceObject(Contact, Contact.getAmount(), new Date());
                                 NewInvoices.add(NewInvoice);
                                 ContactEvents.get(0).setStatus(db.InvoicePaidCode());
-                                start = new Date( event.getBeginEvent().getDateTime().getValue() );
-                                lastMonth = start.getMonth();
-
-
+                                actualMonth = lastMonth;
                             }
                         }
                     }
+                }
 
 
-                case "Weekly":
-                    if (ContactEvents.size() > 0 ) {
-                        EventObject event = ContactEvents.get(0);
-                        InvoiceObject NewInvoice;
-                        Date start = new Date( event.getBeginEvent().getDateTime().getValue() );
-                        //case the first event of the contact is the current month ignore
-                        if ( mMonth == start.getMonth() || mYear == start.getYear() ) {
-                            NewInvoice = new InvoiceObject(Contact,Contact.getAmount(), new Date() );
+            }
+            else if( Contact.getPeriod().equals( db.CHR_TYPE_WEEKLY)  ) {
+                if (ContactEvents.size() > 0) {
+                    EventObject event = ContactEvents.get(0);
+                    InvoiceObject NewInvoice;
+                    Date start = new Date(event.getBeginEvent().getDateTime().getValue());
+                    //case the first event of the contact is the current month ignore
+                    if (mMonth == start.getMonth() || mYear == start.getYear()) {
+
+                        int lastMonth = start.getMonth();
+                        int lastWeek;
+                        int actualWeek = 0;
+                        for (int count = 0; count < ContactEvents.size(); count++) {
+                            event = ContactEvents.get(count);
+                            start = new Date(event.getBeginEvent().getDateTime().getValue());
+                            Cal.setTime(start);
+                            lastWeek = Cal.get(Calendar.WEEK_OF_MONTH);
+
+                            if (!(lastMonth == start.getMonth() || mYear == start.getYear() || lastWeek == mWeek) || actualWeek != lastWeek) {
+                                NewInvoice = new InvoiceObject(Contact, Contact.getAmount(), new Date());
+                                NewInvoices.add(NewInvoice);
+                                start = new Date(event.getBeginEvent().getDateTime().getValue());
+                                lastMonth = start.getMonth();
+                                actualWeek = lastWeek;
+                            }
+
+
+                        }
+
+                    }
+                }
+
+            }
+            else if( Contact.getPeriod().equals(db.CHR_TYPE_PERCLASS) ) {
+
+
+                if (ContactEvents.size() > 0) {
+                    EventObject event = ContactEvents.get(0);
+                    InvoiceObject NewInvoice;
+                    Date start = new Date(event.getBeginEvent().getDateTime().getValue());
+                    //case the first event of the contact is the current month ignore
+                    if (mMonth != start.getMonth() || mYear != start.getYear()) {
+                        NewInvoice = new InvoiceObject(Contact, Contact.getAmount(), new Date());
+                        NewInvoices.add(NewInvoice);
+                        ContactEvents.get(0).setStatus(db.InvoicePaidCode());
+                    }
+
+                    int lastMonth = start.getMonth();
+                    for (int count = 1; count < ContactEvents.size(); count++) {
+                        event = ContactEvents.get(count);
+                        start = new Date(event.getBeginEvent().getDateTime().getValue());
+
+                        if (!(lastMonth == start.getMonth() || mYear == start.getYear())) {
+                            NewInvoice = new InvoiceObject(Contact, Contact.getAmount(), new Date());
                             NewInvoices.add(NewInvoice);
                             ContactEvents.get(0).setStatus(db.InvoicePaidCode());
-                        }
-
-                        int lastMonth = start.getMonth();
-                        Cal.setTime(start);
-                        int lastWeek = Cal.get(Calendar.WEEK_OF_MONTH);
-
-                        for (int count = 1; count < ContactEvents.size(); count++) {
-                            event = ContactEvents.get(count);
-                            start = new Date( event.getBeginEvent().getDateTime().getValue() );
-
-                            if ( !(lastMonth == start.getMonth() || mYear == start.getYear() || lastWeek == Cal.get(Calendar.WEEK_OF_MONTH) ) ) {
-                                NewInvoice = new InvoiceObject(Contact,Contact.getAmount(), new Date() );
-                                NewInvoices.add(NewInvoice);
-                                start = new Date( event.getBeginEvent().getDateTime().getValue() );
-                                lastMonth = start.getMonth();
-                                Cal.setTime(start);
-                                lastWeek = Cal.get(Calendar.WEEK_OF_MONTH);
-                            }
+                            start = new Date(event.getBeginEvent().getDateTime().getValue());
+                            lastMonth = start.getMonth();
 
 
                         }
-
                     }
+                }
 
-                case "Per class":
-
-
+            }
+            else if( Contact.getPeriod().equals(db.CHR_TYPE_PERHOUR) ) {
                     if (ContactEvents.size() > 0 ) {
                         EventObject event = ContactEvents.get(0);
                         InvoiceObject NewInvoice;
-                        Date start = new Date( event.getBeginEvent().getDateTime().getValue() );
-                        //case the first event of the contact is the current month ignore
-                        if ( mMonth == start.getMonth() || mYear == start.getYear() ) {
-                            NewInvoice = new InvoiceObject(Contact,Contact.getAmount(), new Date() );
-                            NewInvoices.add(NewInvoice);
-                            ContactEvents.get(0).setStatus(db.InvoicePaidCode());
-                        }
+                        int lastMonth ;
+                        int sumHours = 0;
 
-                        int lastMonth = start.getMonth();
-                        for (int count = 1; count < ContactEvents.size(); count++) {
-                            event = ContactEvents.get(count);
+                        for (int count = 0; count < ContactEvents.size(); count++) {
+                            Date start = new Date( event.getBeginEvent().getDateTime().getValue() );
+                            Date end   = new Date( event.getEndEvent().getDateTime().getValue() );
+                            long diff = end.getTime() - start.getTime();
+                            long seconds = diff / 1000;
+                            long minutes = seconds / 60;
+                            long hours = minutes / 60;
+                            //long days = hours / 24; //just for reference
+
+                            sumHours += hours;
                             start = new Date( event.getBeginEvent().getDateTime().getValue() );
-
-                            if ( !(lastMonth == start.getMonth() || mYear == start.getYear()) ) {
-                                NewInvoice = new InvoiceObject(Contact,Contact.getAmount(), new Date() );
-                                NewInvoices.add(NewInvoice);
-                                ContactEvents.get(0).setStatus(db.InvoicePaidCode());
-                                start = new Date( event.getBeginEvent().getDateTime().getValue() );
-                                lastMonth = start.getMonth();
-
-
-                            }
-                        }
-                    }
-
-                case "Per Hour":
-                    if (ContactEvents.size() > 0 ) {
-                        EventObject event = ContactEvents.get(0);
-                        InvoiceObject NewInvoice;
-
-                        Date start = new Date( event.getBeginEvent().getDateTime().getValue() );
-                        Date end   = new Date( event.getEndEvent().getDateTime().getValue() );
-
-                        Date diff = new Date( end.getTime() - start.getTime() );
-                        Cal.setTime( diff );
-                        int hours = Cal.get(Calendar.HOUR_OF_DAY);
-                        int lastMonth = start.getMonth();
-
-                        for (int count = 1; count < ContactEvents.size(); count++) {
+                            lastMonth = start.getMonth();
                             event = ContactEvents.get(count);
-
                             if ( (lastMonth == start.getMonth() || mYear == start.getYear()) ) {
-                                NewInvoice = new InvoiceObject(Contact,Contact.getAmount(), new Date() );
+                                NewInvoice = new InvoiceObject(Contact,Contact.getAmount() * sumHours, new Date() );
                                 NewInvoices.add(NewInvoice);
                                 ContactEvents.get(0).setStatus(db.InvoicePaidCode());
-                                start = new Date( event.getBeginEvent().getDateTime().getValue() );
-                                lastMonth = start.getMonth();
-
+                                sumHours = 0;
                             }
                         }
                     }

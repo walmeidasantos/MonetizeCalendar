@@ -72,6 +72,11 @@ public class Storage {
     public static final int INVOICE_PAID = 1;
     public static final int INVOICE_CANCEL = 2;
 
+    public static final String CHR_TYPE_MONTHLY = "Monthly";
+    public static final String CHR_TYPE_WEEKLY = "Weekly";
+    public static final String CHR_TYPE_PERCLASS = "Per class";
+    public static final String CHR_TYPE_PERHOUR = "Per hour";
+
     public static final String TABLE_EVENTXCONTACT = "event_contacts";
     public static final String EVENTXCONTACT_CONTACTID = "idcontact";
     public static final String EVENTXCONTACT_EVENTID = "idevent";
