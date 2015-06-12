@@ -88,7 +88,7 @@ public abstract class EditContactsFragment extends Fragment implements AdapterVi
     @Override
     public void onResume() {
         super.onResume();
-        mAdapter.AddContacts(db.getContacts());
+        mAdapter.AddContacts(db.getAllContacts());
     }
 
 

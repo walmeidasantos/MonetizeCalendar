@@ -1,6 +1,8 @@
 package com.bearapps.ground_control.model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by ursow on 29/05/15.
@@ -12,6 +14,7 @@ public class InvoiceObject {
     protected long amount;
     protected Date CreatedDate ;
     protected String status = "1"; // 1=open , 2= close, 3=Cancel
+    protected List<Integer> eventsId = new ArrayList<Integer>();
 
 
     public InvoiceObject(ContactObject contact, long amount, Date CreatedDate ) {
@@ -32,6 +35,13 @@ public class InvoiceObject {
     public long getAmount() {return this.amount;}
     public void SetAmount(long amount) {
         this.amount = amount;
+    }
+    public void AddEventId(Integer eventId) {
+        this.eventsId.add(eventId);
+    }
+
+    public List<Integer> getEventsId() {
+        return this.eventsId;
     }
 }
 

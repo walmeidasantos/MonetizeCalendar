@@ -37,7 +37,7 @@ public class EditContactMainFragment extends EditContactsFragment {
     @Override
     protected EditContactAdapter getAdapter() {
 
-            return new EditContactAdapter(db.getContacts());
+            return new EditContactAdapter(db.getAllContacts());
     }
 
 

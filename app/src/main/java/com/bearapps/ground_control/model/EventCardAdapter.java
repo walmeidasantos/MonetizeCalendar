@@ -34,6 +34,7 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Clip
         notifyDataSetChanged();
     }
 
+
     @Override
     public int getItemCount() {
         return eventObjectList.size();

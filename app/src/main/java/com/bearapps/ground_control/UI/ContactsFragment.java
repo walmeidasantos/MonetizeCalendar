@@ -1,5 +1,6 @@
 package com.bearapps.ground_control.UI;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -69,7 +70,7 @@ public abstract class ContactsFragment extends Fragment implements AdapterView.O
         db = Storage.getInstance(context);
 
         mAdapter = getAdapter();
-        //mAdapter.AddContacts(db.getContacts());
+        //mAdapter.AddContacts(db.getAllContacts());
         mAdapter.setOnItemClickListener(this);
         mList.setAdapter(mAdapter);
 
@@ -143,7 +144,7 @@ public abstract class ContactsFragment extends Fragment implements AdapterView.O
                             Toast.LENGTH_LONG
                     ).show();
 
-                    List<ContactObject> ChoosedContacts = db.getContacts();
+                    List<ContactObject> ChoosedContacts = db.getAllContacts();
                     for (int count = 0; count < contactObjects.size(); count++) {
                         for (int count2 = 0; count2 < ChoosedContacts.size(); count2++) {
                             if (ChoosedContacts.get(count2).getGoogleId().contentEquals(contactObjects.get(count).getGoogleId())   ) {
@@ -195,202 +196,12 @@ public abstract class ContactsFragment extends Fragment implements AdapterView.O
      * @return List of Strings describing returned events.
      * @throws IOException
      */
-    private List<ContactObject> fecthContacts() throws IOException {
-
-         Uri contactsUri = ContactsContract.Contacts.CONTENT_URI;
-        List<ContactObject> Contacts = new ArrayList<>();
-
-        // Querying the table ContactsContract.Contacts to retrieve all the contacts
-        Cursor contactsCursor = getActivity().getContentResolver().query(contactsUri, null, null, null,
-                ContactsContract.Contacts.DISPLAY_NAME + " ASC ");
-
-        if(contactsCursor.moveToFirst()){
-            do{
-                long contactId = contactsCursor.getLong(contactsCursor.getColumnIndex("_ID"));
-
-
-                Uri dataUri = ContactsContract.Data.CONTENT_URI;
-
-                // Querying the table ContactsContract.Data to retrieve individual items like
-                // home phone, mobile phone, work email etc corresponding to each contact
-                Cursor dataCursor = getActivity().getContentResolver().query(dataUri, null,
-                        ContactsContract.Data.CONTACT_ID + "=" + contactId,
-                        null, null);
-
-
-                String displayName="";
-                String nickName="";
-                String homePhone="";
-                String mobilePhone="";
-                String workPhone="";
-                String photoPath="" + R.drawable.avatar_empty;
-                byte[] photoByte=null;
-                String homeEmail="";
-                String workEmail="";
-                String companyName="";
-                String title="";
-                String Id = "";
-
-
-
-                if(dataCursor.moveToFirst()){
-                    // Getting Display Name
-                    displayName = dataCursor.getString(dataCursor.getColumnIndex(ContactsContract.Data.DISPLAY_NAME ));
-                    Id = dataCursor.getString(dataCursor.getColumnIndex(ContactsContract.Data._ID ));
-                    do{
-
-                        // Getting NickName
-                        if(dataCursor.getString(dataCursor.getColumnIndex("mimetype")).equals(ContactsContract.CommonDataKinds.Nickname.CONTENT_ITEM_TYPE))
-                            nickName = dataCursor.getString(dataCursor.getColumnIndex("data1"));
-
-                        // Getting Phone numbers
-                        if(dataCursor.getString(dataCursor.getColumnIndex("mimetype")).equals(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)){
-                            switch(dataCursor.getInt(dataCursor.getColumnIndex("data2"))){
-                                case ContactsContract.CommonDataKinds.Phone.TYPE_HOME :
-                                    homePhone = dataCursor.getString(dataCursor.getColumnIndex("data1"));
-                                    break;
-                                case ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE :
-                                    mobilePhone = dataCursor.getString(dataCursor.getColumnIndex("data1"));
-                                    break;
-                                case ContactsContract.CommonDataKinds.Phone.TYPE_WORK :
-                                    workPhone = dataCursor.getString(dataCursor.getColumnIndex("data1"));
-                                    break;
-                            }
-                        }
-
-                        // Getting EMails
-                        if(dataCursor.getString(dataCursor.getColumnIndex("mimetype")).equals(ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE ) ) {
-                            switch(dataCursor.getInt(dataCursor.getColumnIndex("data2"))){
-                                case ContactsContract.CommonDataKinds.Email.TYPE_HOME :
-                                    homeEmail = dataCursor.getString(dataCursor.getColumnIndex("data1"));
-                                    break;
-                                case ContactsContract.CommonDataKinds.Email.TYPE_WORK :
-                                    workEmail = dataCursor.getString(dataCursor.getColumnIndex("data1"));
-                                    break;
-                            }
-                        }
-
-                        // Getting Organization details
-                        if(dataCursor.getString(dataCursor.getColumnIndex("mimetype")).equals(ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE)){
-                            companyName = dataCursor.getString(dataCursor.getColumnIndex("data1"));
-                            title = dataCursor.getString(dataCursor.getColumnIndex("data4"));
-                        }
-
-                        // Getting Photo
-                        if(dataCursor.getString(dataCursor.getColumnIndex("mimetype")).equals(ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE)){
-                            photoByte = dataCursor.getBlob(dataCursor.getColumnIndex("data15"));
-
-                            if(photoByte != null) {
-                                Bitmap bitmap = BitmapFactory.decodeByteArray(photoByte, 0, photoByte.length);
-
-                                // Getting Caching directory
-                                File cacheDirectory = getActivity().getBaseContext().getCacheDir();
-
-                                // Temporary file to store the contact image
-                                File tmpFile = new File(cacheDirectory.getPath() + "/wpta_"+contactId+".png");
-
-                                // The FileOutputStream to the temporary file
-                                try {
-                                    FileOutputStream fOutStream = new FileOutputStream(tmpFile);
-
-                                    // Writing the bitmap to the temporary file as png file
-                                    bitmap.compress(Bitmap.CompressFormat.PNG,100, fOutStream);                    displayName = dataCursor.getString(dataCursor.getColumnIndex(ContactsContract.Data.DISPLAY_NAME ));
-
-                                    // Flush the FileOutputStream
-                                    fOutStream.flush();
-
-                                    //Close the FileOutputStream
-                                    fOutStream.close();
-
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-
-                                photoPath = tmpFile.getPath();
-                            }
-                            else {
-                                photoPath = null;
-                            }
-
-                        }
-
-
-                    }while(dataCursor.moveToNext());
-
-
-
-                    /*
-                    String details = "";
-
-                    // Concatenating various information to single string
-                    if(homePhone != null && !homePhone.equals("") )
-                        details = "HomePhone : " + homePhone + "\n";
-                    if(mobilePhone != null && !mobilePhone.equals("") )
-                        details += "MobilePhone : " + mobilePhone + "\n";
-                    if(workPhone != null && !workPhone.equals("") )
-                        details += "WorkPhone : " + workPhone + "\n";
-                    if(nickName != null && !nickName.equals("") )
-                        details += "NickName : " + nickName + "\n";
-                    if(homeEmail != null && !homeEmail.equals("") )
-                        details += "HomeEmail : " + homeEmail + "\n";
-                    if(workEmail != null && !workEmail.equals("") )
-                        details += "WorkEmail : " + workEmail + "\n";
-                    if(companyName != null && !companyName.equals("") )
-                        details += "CompanyName : " + companyName + "\n";
-                    if(title != null && !title.equals("") )
-                        details += "Title : " + title + "\n";
-                    */
-
-                    // Adding id, display name, path to photo and other details to cursor
-
-                }
-
-                Contacts.add(
-                        new ContactObject(
-                                Id,
-                                displayName,
-                                homeEmail,
-                                null,
-                                photoPath
-                        )
-                );
-
-            }while(contactsCursor.moveToNext());
-        }
-        return Contacts;
-
-    }
-
-    /**
-     * An asynchronous task that handles the Calendar API event list retrieval.
-     * Placing the API calls in their own task ensures the UI stays responsive.
-     */
-    private class ContactFecthTask extends AsyncTask<Void, Void, Void> {
-
-        /**
-         * Background task to call Calendar API to fetch event list.
-         * @param params no parameters needed for this task.
-         */
-        @Override
-        protected Void doInBackground(Void... params) {
-            try {
-                updateContactList(fecthContacts());
-            } catch (IOException e) {
-                updateStatus("The following error occurred: " +
-                        e.getMessage());
-            }
-            return null;
-        }
-
-    }
-
 
     /**
      * Created by ursow on 11/04/15.
      */
     public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ClipCardViewHolder> {
         private List<ContactObject> contactObjectList;
-        private boolean allowAnimate = true;
         private AdapterView.OnItemClickListener mOnItemClickListener;
         public ContactAdapter(List<ContactObject> Contacts)  {
 
@@ -437,7 +248,7 @@ public abstract class ContactsFragment extends Fragment implements AdapterView.O
                     if (contactObject.IsChoosed()) {
                         clipCardViewHolder.vCheckUser.setVisibility(View.INVISIBLE);
                         contactObject.setUnChoosed();
-                        db.deleteContact(contactObject.getGoogleId());
+                        db.InactiveContact(contactObject.getGoogleId());
 
                     } else {
                         db.addContact(contactObject);
@@ -454,12 +265,14 @@ public abstract class ContactsFragment extends Fragment implements AdapterView.O
                     if (contactObject.IsChoosed()) {
                         clipCardViewHolder.vCheckUser.setVisibility(View.INVISIBLE);
                         contactObject.setUnChoosed();
-                        db.deleteContact(contactObject.getGoogleId());
+                        db.InactiveContact(contactObject.getGoogleId());
 
                     } else {
                         // db.addContact(contactObject);
                         clipCardViewHolder.vCheckUser.setVisibility(View.VISIBLE);
                         contactObject.setChoosed();
+                        db.ActiveContact(contactObject.getGoogleId());
+
                     }
                 }
             });
@@ -510,5 +323,196 @@ public abstract class ContactsFragment extends Fragment implements AdapterView.O
 
 
     }
+
+    /**
+     * An asynchronous task that handles the Calendar API event list retrieval.
+     * Placing the API calls in their own task ensures the UI stays responsive.
+     */
+    private class ContactFecthTask extends AsyncTask<Void, Void, Void> {
+
+        /**
+         * Background task to call Calendar API to fetch event list.
+         * @param params no parameters needed for this task.
+         */
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                updateContactList(fecthContacts(getActivity() ));
+            } catch (IOException e) {
+                updateStatus("The following error occurred: " +
+                        e.getMessage());
+            }
+            return null;
+        }
+        private List<ContactObject> fecthContacts(Activity mActivity) throws IOException {
+
+            Uri contactsUri = ContactsContract.Contacts.CONTENT_URI;
+            List<ContactObject> Contacts = new ArrayList<>();
+
+            // Querying the table ContactsContract.Contacts to retrieve all the contacts
+            Cursor contactsCursor = mActivity.getContentResolver().query(contactsUri, null, null, null,
+                    ContactsContract.Contacts.DISPLAY_NAME + " ASC ");
+
+            if(contactsCursor.moveToFirst()){
+                do{
+                    long contactId = contactsCursor.getLong(contactsCursor.getColumnIndex("_ID"));
+
+
+                    Uri dataUri = ContactsContract.Data.CONTENT_URI;
+
+                    // Querying the table ContactsContract.Data to retrieve individual items like
+                    // home phone, mobile phone, work email etc corresponding to each contact
+                    Cursor dataCursor = mActivity.getContentResolver().query(dataUri, null,
+                            ContactsContract.Data.CONTACT_ID + "=" + contactId,
+                            null, null);
+
+
+                    String displayName="";
+                    String nickName="";
+                    String homePhone="";
+                    String mobilePhone="";
+                    String workPhone="";
+                    String photoPath="" + R.drawable.avatar_empty;
+                    byte[] photoByte=null;
+                    String homeEmail="";
+                    String workEmail="";
+                    String companyName="";
+                    String title="";
+                    String Id = "";
+
+
+
+                    if(dataCursor.moveToFirst()){
+                        // Getting Display Name
+                        displayName = dataCursor.getString(dataCursor.getColumnIndex(ContactsContract.Data.DISPLAY_NAME ));
+                        Id = dataCursor.getString(dataCursor.getColumnIndex(ContactsContract.Data._ID ));
+                        do{
+
+                            // Getting NickName
+                            if(dataCursor.getString(dataCursor.getColumnIndex("mimetype")).equals(ContactsContract.CommonDataKinds.Nickname.CONTENT_ITEM_TYPE))
+                                nickName = dataCursor.getString(dataCursor.getColumnIndex("data1"));
+
+                            // Getting Phone numbers
+                            if(dataCursor.getString(dataCursor.getColumnIndex("mimetype")).equals(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)){
+                                switch(dataCursor.getInt(dataCursor.getColumnIndex("data2"))){
+                                    case ContactsContract.CommonDataKinds.Phone.TYPE_HOME :
+                                        homePhone = dataCursor.getString(dataCursor.getColumnIndex("data1"));
+                                        break;
+                                    case ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE :
+                                        mobilePhone = dataCursor.getString(dataCursor.getColumnIndex("data1"));
+                                        break;
+                                    case ContactsContract.CommonDataKinds.Phone.TYPE_WORK :
+                                        workPhone = dataCursor.getString(dataCursor.getColumnIndex("data1"));
+                                        break;
+                                }
+                            }
+
+                            // Getting EMails
+                            if(dataCursor.getString(dataCursor.getColumnIndex("mimetype")).equals(ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE ) ) {
+                                switch(dataCursor.getInt(dataCursor.getColumnIndex("data2"))){
+                                    case ContactsContract.CommonDataKinds.Email.TYPE_HOME :
+                                        homeEmail = dataCursor.getString(dataCursor.getColumnIndex("data1"));
+                                        break;
+                                    case ContactsContract.CommonDataKinds.Email.TYPE_WORK :
+                                        workEmail = dataCursor.getString(dataCursor.getColumnIndex("data1"));
+                                        break;
+                                }
+                            }
+
+                            // Getting Organization details
+                            if(dataCursor.getString(dataCursor.getColumnIndex("mimetype")).equals(ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE)){
+                                companyName = dataCursor.getString(dataCursor.getColumnIndex("data1"));
+                                title = dataCursor.getString(dataCursor.getColumnIndex("data4"));
+                            }
+
+                            // Getting Photo
+                            if(dataCursor.getString(dataCursor.getColumnIndex("mimetype")).equals(ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE)){
+                                photoByte = dataCursor.getBlob(dataCursor.getColumnIndex("data15"));
+
+                                if(photoByte != null) {
+                                    Bitmap bitmap = BitmapFactory.decodeByteArray(photoByte, 0, photoByte.length);
+
+                                    // Getting Caching directory
+                                    File cacheDirectory = mActivity.getBaseContext().getCacheDir();
+
+                                    // Temporary file to store the contact image
+                                    File tmpFile = new File(cacheDirectory.getPath() + "/wpta_"+contactId+".png");
+
+                                    // The FileOutputStream to the temporary file
+                                    try {
+                                        FileOutputStream fOutStream = new FileOutputStream(tmpFile);
+
+                                        // Writing the bitmap to the temporary file as png file
+                                        bitmap.compress(Bitmap.CompressFormat.PNG,100, fOutStream);                    displayName = dataCursor.getString(dataCursor.getColumnIndex(ContactsContract.Data.DISPLAY_NAME ));
+
+                                        // Flush the FileOutputStream
+                                        fOutStream.flush();
+
+                                        //Close the FileOutputStream
+                                        fOutStream.close();
+
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    photoPath = tmpFile.getPath();
+                                }
+                                else {
+                                    photoPath = null;
+                                }
+
+                            }
+
+
+                        }while(dataCursor.moveToNext());
+
+
+
+                    /*
+                    String details = "";
+
+                    // Concatenating various information to single string
+                    if(homePhone != null && !homePhone.equals("") )
+                        details = "HomePhone : " + homePhone + "\n";
+                    if(mobilePhone != null && !mobilePhone.equals("") )
+                        details += "MobilePhone : " + mobilePhone + "\n";
+                    if(workPhone != null && !workPhone.equals("") )
+                        details += "WorkPhone : " + workPhone + "\n";
+                    if(nickName != null && !nickName.equals("") )
+                        details += "NickName : " + nickName + "\n";
+                    if(homeEmail != null && !homeEmail.equals("") )
+                        details += "HomeEmail : " + homeEmail + "\n";
+                    if(workEmail != null && !workEmail.equals("") )
+                        details += "WorkEmail : " + workEmail + "\n";
+                    if(companyName != null && !companyName.equals("") )
+                        details += "CompanyName : " + companyName + "\n";
+                    if(title != null && !title.equals("") )
+                        details += "Title : " + title + "\n";
+                    */
+
+                        // Adding id, display name, path to photo and other details to cursor
+
+                    }
+
+                    Contacts.add(
+                            new ContactObject(
+                                    Id,
+                                    displayName,
+                                    homeEmail,
+                                    null,
+                                    photoPath
+                            )
+                    );
+
+                }while(contactsCursor.moveToNext());
+            }
+            return Contacts;
+
+        }
+    }
+
+
+
+
 
 }

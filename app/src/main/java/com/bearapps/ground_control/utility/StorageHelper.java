@@ -19,7 +19,7 @@ import static com.bearapps.ground_control.utility.Storage.*;
             "CREATE TABLE " + TABLE_CONTACTS + " ( `" +
                     CONTACT_ID + "` INTEGER PRIMARY KEY AUTOINCREMENT, `" +
                     CONTACT_GOOGLEID + "` TEXT, `" +
-                    CONTACT_STATUS + "` INTEGER DEFAULT '0', `" +
+                    CONTACT_STATUS + "` INTEGER DEFAULT '1', `" +
                     CONTACT_DTINC +  "` INTEGER DEFAULT 'CURRENT_TIMESTAMP' , `" +
                     CONTACT_NAME + "` TEXT, `" +
                     CONTACT_PHOTO + "` TEXT, `" +

@@ -3,14 +3,10 @@ package com.bearapps.ground_control.utility;
 import android.content.ClipboardManager;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.bearapps.ground_control.R;
 import com.bearapps.ground_control.model.ContactObject;
 import com.bearapps.ground_control.model.EventObject;
 import com.bearapps.ground_control.model.InvoiceObject;
@@ -95,12 +91,13 @@ public class Storage {
     private SQLiteDatabase db;
     private Context context;
     private ClipboardManager eventClipboardManager;
-    private Date latsUpdate = new Date();
+
     private List<EventObject> EventsInMemory;
     private List<ContactObject> ContactsInMemory;
+    private List<InvoiceObject> InvoiceInMemory;
     private boolean isEventInMemoryChanged = true;
     private boolean isContactInMemoryChanged = true;
-    private Date now = new Date();
+    private boolean isInvoiceInMemoryChanged = true;
     private String ContactsId;
 
     private Storage(Context context) {
@@ -114,10 +111,6 @@ public class Storage {
             mInstance = new Storage(context.getApplicationContext());
         }
         return mInstance;
-    }
-
-    private String sqliteEscape(String keyWord) {
-        return DatabaseUtils.sqlEscapeString(keyWord);
     }
 
     private void open() {
@@ -206,7 +199,7 @@ public class Storage {
             isEventInMemoryChanged = false;
         }
 
-        if (EventsInMemory.isEmpty()) {
+        /*if (EventsInMemory.isEmpty()) {
             DateTime start = new DateTime(now, TimeZone.getTimeZone(TimeZone.getDefault().getID()));
             EventDateTime StartEvent = new EventDateTime();
             StartEvent.setDate(start);
@@ -223,30 +216,37 @@ public class Storage {
                             contactsid
                     )
             );
-        }
+        }*/
 
 
         return EventsInMemory;
     }
 
-    public void deleteContact(String googleId) {
-        latsUpdate = new Date();
-        isContactInMemoryChanged = true;
+    public void ChangeStatusContact(String googleid,Integer status) {
         open();
-        int row_id = db.delete(
-                TABLE_CONTACTS,
-                CONTACT_GOOGLEID + "='" + googleId + "'",
-                null
-        );
+        isContactInMemoryChanged = true;
+        ContentValues ContactValues = new ContentValues();
+
+        ContactValues.put(CONTACT_STATUS, status);
+
+        String whereClause = CONTACT_GOOGLEID + " = ?";
+
+        db.update(TABLE_CONTACTS,
+                ContactValues,
+                whereClause,
+                new String[]{String.valueOf(googleid)});
+
         close();
-        if (row_id == -1) {
-            Log.e("Storage", "write db error: Event id " + googleId + ".");
-        }
+    }
+    public void InactiveContact(String googleId) {
+        ChangeStatusContact(googleId, CONTACT_INACTIVE);
     }
 
+    public void ActiveContact(String googleId) {
+        ChangeStatusContact(googleId, CONTACT_ACTIVE);
+    }
 
     public void deleteEvent(int EventId) {
-        latsUpdate = new Date();
         isEventInMemoryChanged = true;
         open();
         int row_id = db.delete(
@@ -270,9 +270,16 @@ public class Storage {
         EventsValues.put(EVENTS_GOOGLEID, eventObject.getGoogleId());
         EventsValues.put(EVENTS_SUMARY, eventObject.getSumary() );
         EventsValues.put(EVENTS_WHERE, eventObject.getWhere());
-        EventsValues.put(EVENTS_BEGINEVENT, eventObject.getBeginEvent().getDateTime().getValue()  );
-        EventsValues.put(EVENTS_ENDEVENT, eventObject.getEndEvent().getDateTime().getValue()  );
-
+        if ( (eventObject.getBeginEvent().getDateTime() == null  )) {
+            EventsValues.put(EVENTS_BEGINEVENT, eventObject.getBeginEvent().getDate().getValue());
+        } else {
+            EventsValues.put(EVENTS_BEGINEVENT, eventObject.getBeginEvent().getDateTime().getValue());
+        }
+        if (eventObject.getEndEvent().getDateTime() == null ) {
+            EventsValues.put(EVENTS_ENDEVENT, eventObject.getEndEvent().getDate().getValue()  );
+        } else {
+            EventsValues.put(EVENTS_ENDEVENT, eventObject.getEndEvent().getDateTime().getValue());
+        }
         db.beginTransaction();
 
         long row_id = db.insert(TABLE_EVENTS, null, EventsValues);
@@ -343,8 +350,42 @@ public class Storage {
         return !error;
     }
 
-    public List<ContactObject> getContacts() {
+    public ContactObject getContact(int id) {
+        open();
 
+        String[] whereParam = new String[] {String.valueOf(id) };
+        String whereClause = CONTACT_ID + " = ? " ;
+
+        String[] COLUMNS_CONTACTS = {CONTACT_GOOGLEID, CONTACT_NAME, CONTACT_EMAIL, CONTACT_STATUS,CONTACT_PHOTO,CONTACT_PERIOD,CONTACT_CHARGE };
+
+        Cursor cursor_Contacts;
+
+        cursor_Contacts = db.query(TABLE_CONTACTS,
+                COLUMNS_CONTACTS,
+                whereClause,//where clause
+                whereParam,//where params
+                null,//groupby
+                null,//having
+                null);//orderby
+
+
+        ContactObject contact = new ContactObject(
+                            cursor_Contacts.getString(0), //googleId
+                            cursor_Contacts.getString(1), //name
+                            cursor_Contacts.getString(2), //email
+                            null,//left disable the status
+                            cursor_Contacts.getString(4), //photoPath
+                            cursor_Contacts.getLong(6), //amount
+                            cursor_Contacts.getString(5)//period
+                    );
+
+        cursor_Contacts.close();
+        close();
+        return contact;
+
+    }
+
+    public List<ContactObject> getAllContacts() {
 
         if (isContactInMemoryChanged) {
             open();
@@ -389,10 +430,56 @@ public class Storage {
         return ContactsInMemory;
     }
 
+    public List<ContactObject> getSelectContacts() {
+
+        if (isContactInMemoryChanged) {
+            open();
+
+            String[] whereParam = new String[] {String.valueOf(CONTACT_ACTIVE) };
+            String whereClause = CONTACT_STATUS + " = ? " ;
+
+            String sortOrder = CONTACT_NAME + " ASC ";
+
+            String[] COLUMNS_CONTACTS = {CONTACT_GOOGLEID, CONTACT_NAME, CONTACT_EMAIL, CONTACT_STATUS,CONTACT_PHOTO,CONTACT_PERIOD,CONTACT_CHARGE };
+
+            Cursor cursor_Contacts;
+
+            cursor_Contacts = db.query(TABLE_CONTACTS,
+                    COLUMNS_CONTACTS,
+                    null,//where clause
+                    null,//where params
+                    null,//groupby
+                    null,//having
+                    sortOrder);//orderby
+
+            ContactsInMemory = new ArrayList<ContactObject>();
+            while (cursor_Contacts.moveToNext()) {
+
+                ContactsInMemory.add(
+                        new ContactObject(
+                                cursor_Contacts.getString(0), //googleId
+                                cursor_Contacts.getString(1), //name
+                                cursor_Contacts.getString(2), //email
+                                null,//left disable the status
+                                cursor_Contacts.getString(4), //photoPath
+                                cursor_Contacts.getLong(6), //amount
+                                cursor_Contacts.getString(5)//period
+                        )
+                );
+
+            }
+
+            cursor_Contacts.close();
+            close();
+            isContactInMemoryChanged = false;
+
+        }
+
+        return ContactsInMemory;
+    }
 
     public EventObject changeEventStatus(EventObject eventObject,int Deciscion) {
         open();
-        latsUpdate = new Date();
         isEventInMemoryChanged = true;
         ContentValues EventsValues = new ContentValues();
 
@@ -408,7 +495,7 @@ public class Storage {
 
         db.update(TABLE_EVENTS,
                 EventsValues,
-                  whereClause,
+                whereClause,
                 new String[] { eventObject.getId().toString() } );
 
         close();
@@ -440,35 +527,103 @@ public class Storage {
                whereClause,
                new String[]{ String.valueOf(GoogleId) });
 
-       getContacts();
+       getAllContacts();
        close();
 
     }
 
     public List<InvoiceObject> getInvoice() {
         List<InvoiceObject> invoices = new ArrayList<>();
+        String[] whereParam = new String[] {String.valueOf(INVOICE_OPEN) };
+        String whereClause = INVOICE_STATUS + " = ? " ;
 
+        if (isInvoiceInMemoryChanged) {
+            open();
+
+            String sortOrder = INVOICE_DTINC + " ASC ";
+
+            String[] COLUMNS_INVOICE = {INVOICE_CONTACTID, INVOICE_ID, INVOICE_AMOUNT, INVOICE_DTINC, INVOICEXEVENTS_EVENTID};
+            Cursor cursor_invoice;
+
+            cursor_invoice = db.query(VIEW_INVOICEXEVENTS,
+                    COLUMNS_INVOICE,
+                    whereClause,//where clause
+                    whereParam,//where params
+                    null,//groupby
+                    null,//having
+                    sortOrder);//orderby
+
+            InvoiceInMemory = new ArrayList<>();
+            while (cursor_invoice.moveToNext()) {
+
+                ContactObject contact = getContact(cursor_invoice.getInt(0));
+
+                InvoiceInMemory.add(
+                        new InvoiceObject(
+                                contact,
+                                cursor_invoice.getLong(2),
+                                new Date(cursor_invoice.getLong(3))
+                        )
+                );
+                InvoiceInMemory.get(InvoiceInMemory.size() - 1).setId(cursor_invoice.getInt(1));//this makes no sense but is for test purpose
+
+            }
+            cursor_invoice.close();
+            close();
+            isInvoiceInMemoryChanged = false;
+        }
         return invoices;
     }
 
 
     public void importInvoice(List<InvoiceObject> newInvoices) {
 
-    }
+        open();
+        for (InvoiceObject invoice : newInvoices) {
 
 
+            List<Integer> eventsId = invoice.getEventsId();
+            Boolean error = false;
 
-    public static void updateDbBroadcast(Context context, Boolean added, String deletedString) {
-        Intent intent = new Intent(UPDATE_DB);
-        if (added) {
-            intent.putExtra(UPDATE_DB_ADD, true);
-        }
-        if (deletedString != null) {
-            if (!deletedString.isEmpty()) {
-                intent.putExtra(UPDATE_DB_DELETE, deletedString);
+            ContentValues InvoiceValues = new ContentValues();
+            ContentValues InvoicexEventsValues = new ContentValues();
+            InvoiceValues.put(INVOICE_AMOUNT, invoice.getAmount());
+            InvoiceValues.put(INVOICE_CONTACTID, invoice.getContact().getId() );
+
+            db.beginTransaction();
+
+            long row_id = db.insert(TABLE_INVOICE, null, InvoiceValues);
+            if (row_id == -1) {
+                Log.e("Storage", "write db error: addInvoice for contact " + invoice.getContact().getName() );
+                error = true;
+            } else {
+                invoice.setId((int) row_id);
+            }
+
+            if (!error) {
+                for (Integer event : eventsId) {
+                    InvoicexEventsValues.put(INVOICEXEVENTS_EVENTID, event );
+                    InvoicexEventsValues.put(INVOICEXEVENTS_ID, invoice.getId() );
+                    row_id = db.insert(TABLE_EVENTXCONTACT, null, InvoicexEventsValues);
+                }
+                if (row_id == -1) {
+                    Log.e("Storage", "write db error: AddInvoicexEvents for contacts " + invoice.getContact().getName() );
+                    error = true;
+
+                } else {
+                    db.setTransactionSuccessful();
+                }
+
+            }
+
+            db.endTransaction();
+            if (!error) {
+                isInvoiceInMemoryChanged = true;
             }
         }
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        close();
+
+        return;
     }
 
 

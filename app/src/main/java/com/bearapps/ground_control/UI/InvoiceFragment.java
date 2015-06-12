@@ -102,7 +102,7 @@ public abstract class InvoiceFragment extends Fragment implements AdapterView.On
     private List<InvoiceObject> generateInvoice() {
 
         List<InvoiceObject> NewInvoices = new ArrayList<>();
-        List<ContactObject> Contacts    = db.getContacts();
+        List<ContactObject> Contacts    = db.getAllContacts();
         List<EventObject> ContactEvents = new ArrayList<>();
 
         Calendar Cal = Calendar.getInstance();
@@ -121,9 +121,9 @@ public abstract class InvoiceFragment extends Fragment implements AdapterView.On
                     //case the first event of the contact is the current month ignore
                     if (mMonth == start.getMonth() || mYear == start.getYear()) {
                         NewInvoice = new InvoiceObject(Contact, Contact.getAmount(), new Date());
-                        NewInvoices.add(NewInvoice);
+                        NewInvoice.AddEventId(event.getId());
                         ContactEvents.get(0).setStatus(db.InvoicePaidCode());
-                        int actualMonth = start.getMonth();
+                        int actualMonth = 0;
 
                         int lastMonth = start.getMonth();
                         for (int count = 1; count < ContactEvents.size(); count++) {
@@ -132,10 +132,14 @@ public abstract class InvoiceFragment extends Fragment implements AdapterView.On
                             lastMonth = start.getMonth();
 
                             if (!(lastMonth == start.getMonth() || mYear == start.getYear()) || actualMonth != lastMonth) {
-                                NewInvoice = new InvoiceObject(Contact, Contact.getAmount(), new Date());
                                 NewInvoices.add(NewInvoice);
+                                NewInvoice = new InvoiceObject(Contact, Contact.getAmount(), new Date());
+                                NewInvoice.AddEventId(event.getId());
+
                                 ContactEvents.get(0).setStatus(db.InvoicePaidCode());
                                 actualMonth = lastMonth;
+                            }else if (actualMonth == lastMonth) {
+                                NewInvoice.AddEventId(event.getId());
                             }
                         }
                     }
@@ -154,6 +158,7 @@ public abstract class InvoiceFragment extends Fragment implements AdapterView.On
                         int lastMonth = start.getMonth();
                         int lastWeek;
                         int actualWeek = 0;
+                        NewInvoice = new InvoiceObject(Contact, Contact.getAmount(), new Date());
                         for (int count = 0; count < ContactEvents.size(); count++) {
                             event = ContactEvents.get(count);
                             start = new Date(event.getBeginEvent().getDateTime().getValue());
@@ -161,11 +166,14 @@ public abstract class InvoiceFragment extends Fragment implements AdapterView.On
                             lastWeek = Cal.get(Calendar.WEEK_OF_MONTH);
 
                             if (!(lastMonth == start.getMonth() || mYear == start.getYear() || lastWeek == mWeek) || actualWeek != lastWeek) {
-                                NewInvoice = new InvoiceObject(Contact, Contact.getAmount(), new Date());
                                 NewInvoices.add(NewInvoice);
+                                NewInvoice = new InvoiceObject(Contact, Contact.getAmount(), new Date());
                                 start = new Date(event.getBeginEvent().getDateTime().getValue());
                                 lastMonth = start.getMonth();
                                 actualWeek = lastWeek;
+
+                            }else if (actualWeek == lastWeek) {
+                                NewInvoice.AddEventId(event.getId());
                             }
 
 
@@ -186,7 +194,9 @@ public abstract class InvoiceFragment extends Fragment implements AdapterView.On
                     if (mMonth != start.getMonth() || mYear != start.getYear()) {
                         NewInvoice = new InvoiceObject(Contact, Contact.getAmount(), new Date());
                         NewInvoices.add(NewInvoice);
+                        NewInvoice.AddEventId(event.getId());
                         ContactEvents.get(0).setStatus(db.InvoicePaidCode());
+
                     }
 
                     int lastMonth = start.getMonth();
@@ -206,8 +216,7 @@ public abstract class InvoiceFragment extends Fragment implements AdapterView.On
                     }
                 }
 
-            }
-            else if( Contact.getPeriod().equals(db.CHR_TYPE_PERHOUR) ) {
+            } else if( Contact.getPeriod().equals(db.CHR_TYPE_PERHOUR) ) {
                     if (ContactEvents.size() > 0 ) {
                         EventObject event = ContactEvents.get(0);
                         InvoiceObject NewInvoice;

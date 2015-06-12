@@ -59,6 +59,7 @@ public class EventObject {
 
         return result; }
     public EventDateTime getBeginEvent() {
+
         EventDateTime result = BeginEvent;
         return result ; }
     public EventDateTime getEndEvent() {

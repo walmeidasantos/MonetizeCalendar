@@ -42,7 +42,7 @@ public class ContactMainFragment extends ContactsFragment {
     @Override
     protected ContactAdapter getAdapter() {
 
-            return new ContactAdapter(db.getContacts());
+            return new ContactAdapter(db.getAllContacts());
     }
 
 
