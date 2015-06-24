@@ -1,4 +1,4 @@
-package com.bearapps.ground_control.UI;
+package com.bearapps.MonetizeCalendar.UI;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,20 +11,18 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ImageButton;
 
-import com.bearapps.ground_control.R;
-import com.bearapps.ground_control.utility.Storage;
+import com.bearapps.MonetizeCalendar.R;
+import com.bearapps.MonetizeCalendar.utility.Storage;
 
 
 public class MainActivity extends ActionBarActivity implements NavigationDrawerCallbacks {
 
-    public static String APP_NAME;
     public final static String EXTRA_IS_FROM_NOTIFICATION = "teste";
+    public static String APP_NAME;
+    private static Context context;
     private NavigationDrawerFragment mNavigationDrawerFragment;
-
-
     private Toolbar mToolbar;
     private ImageButton mFAB;
-    private static Context context;
     private Storage db;
     private CharSequence mTitle;
 
@@ -45,13 +43,13 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
 
         mFAB = (ImageButton) findViewById(R.id.main_fab);
 
-         mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_drawer);
+        mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_drawer);
         // Set up the drawer_layout.
         mNavigationDrawerFragment.setUp(
                 R.id.fragment_drawer,
                 (DrawerLayout) findViewById(R.id.drawer),
                 mToolbar
-                );
+        );
     }
 
 

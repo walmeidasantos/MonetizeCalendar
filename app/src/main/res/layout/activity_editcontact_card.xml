@@ -101,10 +101,10 @@
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_toStartOf="@+id/text_amount" />
+                android:layout_toStartOf="@+id/text_invoicevalue" />
 
             <TextView
-                android:id="@+id/text_amount"
+                android:id="@+id/text_invoicevalue"
                 android:gravity="left"
                 android:ellipsize="end"
                 android:maxLines="1"

@@ -1,4 +1,4 @@
-package com.bearapps.ground_control.UI;
+package com.bearapps.MonetizeCalendar.UI;
 
 import android.accounts.AccountManager;
 import android.app.Dialog;
@@ -20,11 +20,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Toast;
 
-import com.bearapps.ground_control.R;
-import com.bearapps.ground_control.model.ContactObject;
-import com.bearapps.ground_control.model.EventCardAdapter;
-import com.bearapps.ground_control.model.EventObject;
-import com.bearapps.ground_control.utility.Storage;
+import com.bearapps.MonetizeCalendar.R;
+import com.bearapps.MonetizeCalendar.model.ContactObject;
+import com.bearapps.MonetizeCalendar.model.EventCardAdapter;
+import com.bearapps.MonetizeCalendar.model.EventObject;
+import com.bearapps.MonetizeCalendar.utility.Storage;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -58,33 +58,34 @@ import java.util.TimeZone;
 
 public abstract class EventsFragment extends Fragment implements AdapterView.OnItemClickListener {
 
+    public static final int REQUEST_ACCOUNT_PICKER = 1000;
+    public static final int REQUEST_AUTHORIZATION = 1001;
+    public static final String PREF_ACCOUNT_NAME = "APP_DEFAULT_ACCOUNT";
+    static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
+    private static final String SYNC_TOKEN_CALENDAR = "SYNC_TOKEN";
+    private static final String[] SCOPES = {CalendarScopes.CALENDAR_READONLY};
+    final HttpTransport transport = AndroidHttp.newCompatibleTransport();
+    final JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
+    public com.google.api.services.calendar.Calendar mService;
+    GoogleAccountCredential credential;
+    SharedPreferences settings;
     private RecyclerView mList;
     private EventCardAdapter mAdapter;
     private Storage db;
     private Context context;
     private String message;
     private List<EventObject> events;
-
     private int isSnackbarShow = 0;
 
-
-    /** Required Overrides for Sample Fragments */
+    /**
+     * Required Overrides for Sample Fragments
+     */
 
     protected abstract RecyclerView.LayoutManager getLayoutManager();
-    protected abstract RecyclerView.ItemDecoration getItemDecoration();
-    protected abstract EventCardAdapter getAdapter();
 
-    GoogleAccountCredential credential;
-    public com.google.api.services.calendar.Calendar mService;
-    public static final int REQUEST_ACCOUNT_PICKER = 1000;
-    public static final int REQUEST_AUTHORIZATION = 1001;
-    static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
-    private static final String PREF_ACCOUNT_NAME = "APP_DEFAULT_ACCOUNT";
-    private static final String SYNC_TOKEN_CALENDAR = "SYNC_TOKEN";
-    private static final String[] SCOPES = {CalendarScopes.CALENDAR_READONLY};
-    final HttpTransport transport = AndroidHttp.newCompatibleTransport();
-    final JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
-    SharedPreferences settings ;
+    protected abstract RecyclerView.ItemDecoration getItemDecoration();
+
+    protected abstract EventCardAdapter getAdapter();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -134,12 +135,13 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
 
                                 return true;
                             }
+
                             @Override
                             public void onDismissedBySwipeLeft(RecyclerView recyclerView, int[] reverseSortedPositions) {
                                 for (int position : reverseSortedPositions) {
                                     showSnackbar(position, events.get(position), mAdapter, db.EVENT_CANCEL);
                                     mAdapter.remove(position);
-
+                                    events.remove(position);
                                 }
                             }
 
@@ -148,6 +150,7 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
                                 for (int position : reverseSortedPositions) {
                                     showSnackbar(position, events.get(position), mAdapter, db.EVENT_CONCLUDED);
                                     mAdapter.remove(position);
+                                    events.remove(position);
                                 }
                             }
                         });
@@ -156,16 +159,13 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                    if (isSnackbarShow > 0) return;
-                }
+                if (isSnackbarShow > 0) return;
+            }
 
 
         };
         mList.setOnScrollListener(scrollListener);
         mList.addOnItemTouchListener(swipeDeleteTouchListener);
-
-
-
 
 
         return rootView;
@@ -178,7 +178,7 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-           return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item);
 
     }
 
@@ -214,12 +214,11 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
         if (GooglePlayServicesUtil.isUserRecoverableError(connectionStatusCode)) {
             showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode);
             return false;
-        } else if (connectionStatusCode != ConnectionResult.SUCCESS ) {
+        } else if (connectionStatusCode != ConnectionResult.SUCCESS) {
             return false;
         }
         return true;
     }
-
 
 
     public void showGooglePlayServicesAvailabilityErrorDialog(
@@ -240,17 +239,18 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
      * Called when an activity launched here (specifically, AccountPicker
      * and authorization) exits, giving you the requestCode you started it with,
      * the resultCode it returned, and any additional data from it.
+     *
      * @param requestCode code indicating which activity result is incoming.
-     * @param resultCode code indicating the result of the incoming
-     *     activity result.
-     * @param data Intent (containing result data) returned by incoming
-     *     activity result.
+     * @param resultCode  code indicating the result of the incoming
+     *                    activity result.
+     * @param data        Intent (containing result data) returned by incoming
+     *                    activity result.
      */
     @Override
     public void onActivityResult(
             int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch(requestCode) {
+        switch (requestCode) {
             case REQUEST_GOOGLE_PLAY_SERVICES:
                 if (resultCode == getActivity().RESULT_OK) {
                     refreshEventList();
@@ -265,6 +265,7 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
                             data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
                     if (accountName != null) {
                         credential.setSelectedAccountName(accountName);
+
                         SharedPreferences settings =
                                 getActivity().getPreferences(Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = settings.edit();
@@ -293,42 +294,52 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
 
 
     public void updateEventList(final List<EventObject> eventObjects) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (eventObjects == null) {
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (eventObjects == null) {
 
-                    Toast.makeText(
-                            getActivity(),
-                            getString(R.string.error_retrivieving),
-                            Toast.LENGTH_LONG
-                    ).show();
+                        Toast.makeText(
+                                getActivity(),
+                                getString(R.string.error_retrivieving),
+                                Toast.LENGTH_LONG
+                        ).show();
 
-                } else if (eventObjects.size() == 0) {
-                    events = db.getEvents();
-                    mAdapter.AddEvents(events);
-                    Toast.makeText(
-                            getActivity(),
-                            getString(R.string.no_events),
-                            Toast.LENGTH_LONG
-                    ).show();
+                    } else if (eventObjects.size() == 0) {
+                        events = db.getEvents();
+                        mAdapter.AddEvents(events);
+                        Toast.makeText(
+                                getActivity(),
+                                getString(R.string.no_events),
+                                Toast.LENGTH_LONG
+                        ).show();
 
-                } else {
+                    } else {
 
-                    db.importEvents(eventObjects);
-                    events = db.getEvents();
-                    mAdapter.AddEvents(events);
+                        db.importEvents(eventObjects);
+                        events = db.getEvents();
+                        mAdapter.AddEvents(events);
 
-                    Toast.makeText(
-                            getActivity(),
-                            getString(R.string.updated),
-                            Toast.LENGTH_LONG
-                    ).show();
+                        if (events.size() > 0) {
+                            Toast.makeText(
+                                    getActivity(),
+                                    getString(R.string.updated),
+                                    Toast.LENGTH_LONG
+                            ).show();
+                        } else {
+                            Toast.makeText(
+                                    getActivity(),
+                                    getString(R.string.no_events),
+                                    Toast.LENGTH_LONG
+                            ).show();
+                        }
 
 
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
 
@@ -344,7 +355,6 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
             }
         });
     }
-
 
 
     private void refreshEventList() {
@@ -393,140 +403,9 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
 
             }
         });
-    };
-
-   private class EventFetchTask extends AsyncTask<Void, Void, Void> {
-        private EventsFragment mActivity;
-
-        EventFetchTask(EventsFragment activity) { this.mActivity = activity;  }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            try {
-                clearEvents();
-                mActivity.updateEventList(fetchEventsFromCalendar());
-
-
-            } catch (final GooglePlayServicesAvailabilityIOException availabilityException) {
-                showGooglePlayServicesAvailabilityErrorDialog(
-                        availabilityException.getConnectionStatusCode());
-
-            } catch (UserRecoverableAuthIOException userRecoverableException) {
-                startActivityForResult(
-                        userRecoverableException.getIntent(),
-                        REQUEST_AUTHORIZATION);
-
-            } catch (IOException e) {
-                updateStatus("The following error occurred: " +
-                        e.getMessage());
-            }
-            return null;
-        }
-       /**
-        * Fetch a list of the next 10 events from the primary calendar.
-        * @return List of Strings describing returned events.
-        * @throws java.io.IOException
-        */
-       private List<EventObject> fetchEventsFromCalendar() throws IOException {
-           // List the next 10 events from the primary calendar.
-           List<String> EventsAttendee = new ArrayList<>();
-           List<EventObject> eventsObject =  new ArrayList<>();
-           Events events;
-           String token = settings.getString(SYNC_TOKEN_CALENDAR, null);
-           token = null;
-
-           if (token != null ) {
-               mService.events().list("primary");
-               events = mService.events().list("primary").setAlwaysIncludeEmail(true).setMaxResults(2500).setSyncToken(token).execute();
-
-           } else {
-               Calendar Cal = Calendar.getInstance();
-               Cal.setTimeZone( TimeZone.getDefault() );
-               Cal.add(Calendar.YEAR, -1);
-               Date oneYearAgo = Cal.getTime();
-               events = mService.events().list("primary").setAlwaysIncludeEmail(true).setMaxResults(2500).setTimeMin(new DateTime(oneYearAgo, TimeZone.getDefault())).execute();
-
-           }
-           //mService.events().list("primary").setAlwaysIncludeEmail(true);
-           //mService.events().list("primary").setMaxResults(2500);
-           //google example enters a loop infinite
-        /*String pageToken = null;
-        List<Event> eventsItems = new ArrayList<Event>();;
-        do {
-            mService.events().list("primary").setPageToken(pageToken);
-
-            try {
-
-                events = mService.events().list("primary").execute();
-
-            } catch (GoogleJsonResponseException e) {
-                if (e.getStatusCode() == 410 ) {
-                    // A 410 status code, "Gone", indicates that the sync token is invalid.
-                    SharedPreferences.Editor editor = settings.edit();
-                    editor.putString(SYNC_TOKEN_CALENDAR, null);
-                    editor.commit();
-                    throw e;
-                } else {
-                    throw e;
-                }
-            }
-
-            eventsItems.addAll(events.getItems());
-            pageToken = events.getNextPageToken();
-
-
-        } while (pageToken != null);*/
-        /*
-        events = mService.events().list("primary").execute();
-        */
-           List<Event> eventsItems = new ArrayList<Event>();
-           eventsItems.addAll(events.getItems());
-
-           for (Event event : eventsItems) {
-
-               if ( event.getOrganizer().isSelf() ) { //is the event created by the owner of the account?
-
-                   // Populate the map
-                   Map<String,ContactObject> seletedContats = new HashMap<String,ContactObject>();
-                   for( ContactObject contact : db.getAllContacts() ) {
-                       seletedContats.put(contact.getEmail(), contact);
-                   }
-
-                   List<EventAttendee> contactsid = event.getAttendees();
-                   if ( !event.isEndTimeUnspecified() && contactsid != null   ) {
-                       for (EventAttendee contact : contactsid) {
-                           if ( seletedContats.containsKey( contact.getEmail() ) ) {//if there is not any Attendees not record the event
-                               EventsAttendee.add(contact.getEmail());
-                           }
-                       }
-
-                       if (EventsAttendee.size() > 0 ) {
-                           eventsObject.add(
-                                   new EventObject(
-                                           event.getId(),
-                                           event.getSummary(),
-                                           event.getStart(),
-                                           event.getEnd(),
-                                           event.getLocation(),
-                                           EventsAttendee
-                                   )
-                           );
-                       }
-                   }
-               }
-           }
-
-
-           token = events.getNextSyncToken();
-
-           SharedPreferences.Editor editor = settings.edit();
-           editor.putString(SYNC_TOKEN_CALENDAR, token);
-           editor.commit();
-
-           return eventsObject;
-       }
-
     }
+
+    ;
 
     private void showSnackbar(final int position, final EventObject eventObject, final EventCardAdapter eventCardAdapter, final int decision) {
         final boolean[] isUndo = new boolean[1];
@@ -534,8 +413,7 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
 
         if (decision == db.EVENT_CANCEL) {
             message = getString(R.string.event_cancel);
-        }
-        else if (decision == db.EVENT_CONCLUDED) {
+        } else if (decision == db.EVENT_CONCLUDED) {
             message = getString(R.string.event_concluded);
         }
 
@@ -602,9 +480,145 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
                 , getActivity());
     }
 
+    private class EventFetchTask extends AsyncTask<Void, Void, Void> {
+        private EventsFragment mActivity;
+
+        EventFetchTask(EventsFragment activity) {
+            this.mActivity = activity;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                clearEvents();
+                mActivity.updateEventList(fetchEventsFromCalendar());
 
 
+            } catch (final GooglePlayServicesAvailabilityIOException availabilityException) {
+                showGooglePlayServicesAvailabilityErrorDialog(
+                        availabilityException.getConnectionStatusCode());
 
+            } catch (UserRecoverableAuthIOException userRecoverableException) {
+                startActivityForResult(
+                        userRecoverableException.getIntent(),
+                        REQUEST_AUTHORIZATION);
+
+            } catch (IOException e) {
+                updateStatus("The following error occurred: " +
+                        e.getMessage());
+            }
+            return null;
+        }
+
+        /**
+         * Fetch a list of the next 10 events from the primary calendar.
+         *
+         * @return List of Strings describing returned events.
+         * @throws java.io.IOException
+         */
+        private List<EventObject> fetchEventsFromCalendar() throws IOException {
+            // List the next 10 events from the primary calendar.
+            List<Integer> ContactsEventsId = new ArrayList<>();
+            List<String> ContactsEventsEmail = new ArrayList<>();
+            List<EventObject> eventsObject = new ArrayList<>();
+            Events events;
+            String token = settings.getString(SYNC_TOKEN_CALENDAR, null);
+            token = null;
+
+            if (token != null) {
+                mService.events().list("primary");
+                events = mService.events().list("primary").setAlwaysIncludeEmail(true).setMaxResults(2500).setSyncToken(token).execute();
+
+            } else {
+                Calendar Cal = Calendar.getInstance();
+                Cal.setTimeZone(TimeZone.getDefault());
+                Cal.add(Calendar.YEAR, -1);
+                Date oneYearAgo = Cal.getTime();
+                events = mService.events().list("primary").setAlwaysIncludeEmail(true).setMaxResults(2500).setTimeMin(new DateTime(oneYearAgo, TimeZone.getDefault())).execute();
+
+            }
+            //mService.events().list("primary").setAlwaysIncludeEmail(true);
+            //mService.events().list("primary").setMaxResults(2500);
+            //google example enters a loop infinite
+        /*String pageToken = null;
+        List<Event> eventsItems = new ArrayList<Event>();;
+        do {
+            mService.events().list("primary").setPageToken(pageToken);
+
+            try {
+
+                events = mService.events().list("primary").execute();
+
+            } catch (GoogleJsonResponseException e) {
+                if (e.getStatusCode() == 410 ) {
+                    // A 410 status code, "Gone", indicates that the sync token is invalid.
+                    SharedPreferences.Editor editor = settings.edit();
+                    editor.putString(SYNC_TOKEN_CALENDAR, null);
+                    editor.commit();
+                    throw e;
+                } else {
+                    throw e;
+                }
+            }
+
+            eventsItems.addAll(events.getItems());
+            pageToken = events.getNextPageToken();
+
+
+        } while (pageToken != null);*/
+        /*
+        events = mService.events().list("primary").execute();
+        */
+            List<Event> eventsItems = new ArrayList<Event>();
+            eventsItems.addAll(events.getItems());
+
+            for (Event event : eventsItems) {
+
+                if (event.getOrganizer().isSelf()) { //is the event created by the owner of the account?
+
+                    // Populate the map
+                    Map<String, ContactObject> seletedContats = new HashMap<String, ContactObject>();
+                    for (ContactObject contact : db.getAllContacts()) {
+                        seletedContats.put(contact.getEmail(), contact);
+                    }
+
+                    List<EventAttendee> contactsid = event.getAttendees();
+                    if (!event.isEndTimeUnspecified() && contactsid != null) {
+                        for (EventAttendee contact : contactsid) {
+                            if (seletedContats.containsKey(contact.getEmail())) {//if there is not any Attendees not record the event
+                                ContactsEventsId.add(db.getContactId(contact.getEmail()));
+                                ContactsEventsEmail.add(contact.getEmail());
+                            }
+                        }
+
+                        if (ContactsEventsId.size() > 0) {
+                            eventsObject.add(
+                                    new EventObject(
+                                            event.getId(),
+                                            event.getSummary(),
+                                            event.getStart(),
+                                            event.getEnd(),
+                                            event.getLocation(),
+                                            ContactsEventsId,
+                                            ContactsEventsEmail
+                                    )
+                            );
+                        }
+                    }
+                }
+            }
+
+
+            token = events.getNextSyncToken();
+
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putString(SYNC_TOKEN_CALENDAR, token);
+            editor.commit();
+
+            return eventsObject;
+        }
+
+    }
 
 
 }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Ground_control</string>
+    <string name="app_name">MonetizeCalendar</string>
     <string name="action_settings">Settings</string>
     <string name="drawer_open">Menu opened</string>
     <string name="drawer_close">Menu closed</string>
@@ -21,7 +21,7 @@
     <string name="time_format_with_second">HH:mm:ss</string>
     <string name="title_activity_activity_editor">Edit</string>
     <string name="action_share">Share</string>
-    <string name="action_save">Save</string>
+    <string name="action_save">Saved</string>
     <string name="action_cancel">Cancel</string>
     <string name="toast_deleted">Deleted.</string>
     <string name="action_refresh">Refresh</string>
@@ -110,7 +110,7 @@
     <string name="retrieving_events">Retrieving events…</string>
     <string name="error_retrivieving">Error retrieving events!</string>
     <string name="no_events">No upcoming events found.</string>
-    <string name="updated">Your upcoming events was retrieved</string>
+    <string name="updated">Your upcoming events were retrieved</string>
     <string name="account_unspecified">Account unspecified.</string>
     <string name="no_network">No network connection available.</string>
     <string name="google_play_services">Google Play Services required: after installing, close and relaunch this app.</string>
@@ -129,9 +129,16 @@
     <string name="weekly">Weekly</string>
     <string name="per_class">Per class</string>
     <string name="per_hour">Per Hour</string>
-    <string-array name="card_array">
-        <item>Main</item>
-        <item>Screen 1 </item>
-        <item>Screen 2 </item>
-    </string-array>
+    <string name="invoice">Invoice</string>
+    <string name="error_retrieving_invoice">Error retrivieview your invoice.</string>
+    <string name="no_new_invoices">No new invoices.</string>
+    <string name="new_invoices">New invoices created.</string>
+    <string name="account_choosed">Account choosed:</string>
+    <string name="help_contact"><![CDATA[Help & Contact]]></string>
+    <string name="wait_contacts">Wait here while reading your contacts.</string>
+    <string name="contacts_arrived">Your contacts has arrived</string>
+    <string name="no_contacts">No new contacts</string>
+    <string name="error_retrieving_contacts">Error retrieving your contacts</string>
+
+
 </resources>

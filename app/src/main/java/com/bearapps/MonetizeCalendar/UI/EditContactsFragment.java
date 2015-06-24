@@ -1,4 +1,4 @@
-package com.bearapps.ground_control.UI;
+package com.bearapps.MonetizeCalendar.UI;
 
 import android.content.Context;
 import android.content.Intent;
@@ -17,9 +17,9 @@ import android.widget.QuickContactBadge;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bearapps.ground_control.R;
-import com.bearapps.ground_control.model.ContactObject;
-import com.bearapps.ground_control.utility.Storage;
+import com.bearapps.MonetizeCalendar.R;
+import com.bearapps.MonetizeCalendar.model.ContactObject;
+import com.bearapps.MonetizeCalendar.utility.Storage;
 
 import java.util.List;
 
@@ -30,11 +30,13 @@ public abstract class EditContactsFragment extends Fragment implements AdapterVi
     private EditContactAdapter mAdapter;
     private Storage db;
     private Context context;
-    private String TAG = "ground_control";
+    private String TAG = "MonetizeCalendar";
     private ContactObject contactObject;
 
     protected abstract RecyclerView.LayoutManager getLayoutManager();
+
     protected abstract RecyclerView.ItemDecoration getItemDecoration();
+
     protected abstract EditContactAdapter getAdapter();
 
     @Override
@@ -74,7 +76,7 @@ public abstract class EditContactsFragment extends Fragment implements AdapterVi
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-           return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item);
 
     }
 
@@ -92,15 +94,15 @@ public abstract class EditContactsFragment extends Fragment implements AdapterVi
     }
 
 
-
-      /**
+    /**
      * Created by ursow on 19/05/15.
      */
     public class EditContactAdapter extends RecyclerView.Adapter<EditContactAdapter.ClipCardViewHolder> {
         private List<ContactObject> contactObjectList;
         private boolean allowAnimate = true;
         private AdapterView.OnItemClickListener mOnItemClickListener;
-        public EditContactAdapter(List<ContactObject> Contacts)  {
+
+        public EditContactAdapter(List<ContactObject> Contacts) {
 
             contactObjectList = Contacts;
             notifyDataSetChanged();
@@ -116,16 +118,15 @@ public abstract class EditContactsFragment extends Fragment implements AdapterVi
         public void onBindViewHolder(final ClipCardViewHolder clipCardViewHolder, int i) {
             contactObject = contactObjectList.get(i);
 
-            clipCardViewHolder.vEmail.setText(contactObject.getEmail() );
+            clipCardViewHolder.vEmail.setText(contactObject.getEmail());
             clipCardViewHolder.vContact.setText(contactObject.getName());
-            if ( contactObject.getPhotoPath() == null ) {
+            if (contactObject.getPhotoPath() == null) {
                 clipCardViewHolder.vBagde.setImageResource(R.drawable.avatar_empty);
-            }
-            else {
+            } else {
                 clipCardViewHolder.vBagde.setImageURI(Uri.parse(contactObject.getPhotoPath()));
             }
-            clipCardViewHolder.vAmount.setText( String.valueOf( contactObject.getAmount() ) );
-            clipCardViewHolder.vPeriod.setText( contactObject.getPeriod() );
+            clipCardViewHolder.vAmount.setText(String.valueOf(contactObject.getAmount()));
+            clipCardViewHolder.vPeriod.setText(contactObject.getPeriod());
             clipCardViewHolder.vBagde.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -144,15 +145,16 @@ public abstract class EditContactsFragment extends Fragment implements AdapterVi
             //setAnimation(clipCardViewHolder.vMain, i);
 
         }
-          public void AddContacts(final List<ContactObject> NewContacts) {
-              if ( !NewContacts.isEmpty() ) {
-                  contactObjectList = NewContacts;
-                  notifyDataSetChanged();
-              }
-          }
+
+        public void AddContacts(final List<ContactObject> NewContacts) {
+            if (!NewContacts.isEmpty()) {
+                contactObjectList = NewContacts;
+                notifyDataSetChanged();
+            }
+        }
 
         @Override
-        public ClipCardViewHolder onCreateViewHolder( ViewGroup viewGroup, int i) {
+        public ClipCardViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
             View itemView = LayoutInflater.
                     from(viewGroup.getContext()).
                     inflate(R.layout.activity_editcontact_card, viewGroup, false);
@@ -160,6 +162,9 @@ public abstract class EditContactsFragment extends Fragment implements AdapterVi
             return new ClipCardViewHolder(itemView);
         }
 
+        public void setOnItemClickListener(AdapterView.OnItemClickListener onItemClickListener) {
+            mOnItemClickListener = onItemClickListener;
+        }
 
         public class ClipCardViewHolder extends RecyclerView.ViewHolder {
             protected TextView vContact;
@@ -181,11 +186,6 @@ public abstract class EditContactsFragment extends Fragment implements AdapterVi
                 vMain = v;
             }
         }
-
-        public void setOnItemClickListener(AdapterView.OnItemClickListener onItemClickListener) {
-            mOnItemClickListener = onItemClickListener;
-        }
-
 
 
     }

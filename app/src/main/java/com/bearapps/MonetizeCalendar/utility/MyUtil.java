@@ -1,12 +1,11 @@
-package com.bearapps.ground_control.utility;
+package com.bearapps.MonetizeCalendar.utility;
 
 import android.content.Context;
 
-import com.bearapps.ground_control.UI.MainActivity;
+import com.bearapps.MonetizeCalendar.UI.MainActivity;
 import com.google.api.client.util.DateTime;
 
 import java.text.SimpleDateFormat;
-
 
 
 /**
@@ -16,14 +15,14 @@ import java.text.SimpleDateFormat;
 public class MyUtil {
     public final static String PACKAGE_NAME = MainActivity.APP_NAME;
 
-    public static int dip2px(Context context, float dipValue){
+    public static int dip2px(Context context, float dipValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
-        return (int)(dipValue * scale + 0.5f);
+        return (int) (dipValue * scale + 0.5f);
     }
 
-    public static int px2dip(Context context, float pxValue){
+    public static int px2dip(Context context, float pxValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
-        return (int)(pxValue / scale + 0.5f);
+        return (int) (pxValue / scale + 0.5f);
     }
 
     public static String stringLengthCut(String string) {
@@ -32,8 +31,8 @@ public class MyUtil {
 
     public static String stringLengthCut(String string, int length) {
         string = string.trim();
-        return  (string.length() > length) ?
-                string.substring(0, length - 2).trim()+"…"
+        return (string.length() > length) ?
+                string.substring(0, length - 2).trim() + "…"
                 : string.trim();
     }
 

@@ -44,7 +44,7 @@
         android:elevation="4dp"
         android:onClick="mFabOnClick" />
     <!-- android:layout_marginTop="?android:attr/actionBarSize"-->
-    <com.bearapps.ground_control.UI.ScrimInsetsFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <com.bearapps.MonetizeCalendar.UI.ScrimInsetsFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/scrimInsetsFrameLayout"
         android:layout_width="@dimen/navigation_drawer_width"
@@ -56,11 +56,10 @@
 
         <fragment
             android:id="@+id/fragment_drawer"
-            android:name="com.bearapps.ground_control.UI.NavigationDrawerFragment"
+            android:name="com.bearapps.MonetizeCalendar.UI.NavigationDrawerFragment"
             android:layout_width="@dimen/navigation_drawer_width"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            app:layout="@layout/fragment_navigation_drawer"
             tools:layout="@layout/fragment_navigation_google" />
-    </com.bearapps.ground_control.UI.ScrimInsetsFrameLayout>
+    </com.bearapps.MonetizeCalendar.UI.ScrimInsetsFrameLayout>
 </android.support.v4.widget.DrawerLayout>

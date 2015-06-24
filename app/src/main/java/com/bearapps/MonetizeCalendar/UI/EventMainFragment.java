@@ -1,12 +1,12 @@
-package com.bearapps.ground_control.UI;
+package com.bearapps.MonetizeCalendar.UI;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.bearapps.ground_control.model.EventCardAdapter;
-import com.bearapps.ground_control.utility.Storage;
+import com.bearapps.MonetizeCalendar.model.EventCardAdapter;
+import com.bearapps.MonetizeCalendar.utility.Storage;
 
 public class EventMainFragment extends EventsFragment {
     private Storage db;
@@ -38,7 +38,7 @@ public class EventMainFragment extends EventsFragment {
     @Override
     protected EventCardAdapter getAdapter() {
 
-            return new EventCardAdapter(db.getEvents());
+        return new EventCardAdapter(db.getEvents());
     }
 
 

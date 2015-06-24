@@ -1,4 +1,4 @@
-package com.bearapps.ground_control.UI;
+package com.bearapps.MonetizeCalendar.UI;
 
 import android.content.Context;
 import android.net.Uri;
@@ -17,11 +17,11 @@ import android.widget.QuickContactBadge;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bearapps.ground_control.R;
-import com.bearapps.ground_control.model.ContactObject;
-import com.bearapps.ground_control.model.EventObject;
-import com.bearapps.ground_control.model.InvoiceObject;
-import com.bearapps.ground_control.utility.Storage;
+import com.bearapps.MonetizeCalendar.R;
+import com.bearapps.MonetizeCalendar.model.ContactObject;
+import com.bearapps.MonetizeCalendar.model.EventObject;
+import com.bearapps.MonetizeCalendar.model.InvoiceObject;
+import com.bearapps.MonetizeCalendar.utility.Storage;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -36,7 +36,7 @@ public abstract class InvoiceFragment extends Fragment implements AdapterView.On
     private InvoiceAdapter mAdapter;
     private Storage db;
     private Context context;
-    private String TAG = "ground_control";
+    private String TAG = "MonetizeCalendar";
 
     protected abstract RecyclerView.LayoutManager getLayoutManager();
 
@@ -102,26 +102,28 @@ public abstract class InvoiceFragment extends Fragment implements AdapterView.On
     private List<InvoiceObject> generateInvoice() {
 
         List<InvoiceObject> NewInvoices = new ArrayList<>();
-        List<ContactObject> Contacts    = db.getAllContacts();
+        List<ContactObject> Contacts = db.getAllContacts();
         List<EventObject> ContactEvents = new ArrayList<>();
 
         Calendar Cal = Calendar.getInstance();
-        Cal.setTimeZone( TimeZone.getDefault() );
+        Cal.setTimeZone(TimeZone.getDefault());
         int mYear = Cal.get(Calendar.YEAR); //actual year
         int mMonth = Cal.get(Calendar.MONTH);//actual month
         int mWeek = Cal.get(Calendar.WEEK_OF_MONTH);//actual day
 
-        for (ContactObject Contact: Contacts) {
+        for (ContactObject Contact : Contacts) {
             ContactEvents = db.getEvents(Contact);
-            if ( Contact.getPeriod().equals(db.CHR_TYPE_MONTHLY) ) {
+            if (Contact.getPeriod().equals(db.CHR_TYPE_MONTHLY)) {
                 if (ContactEvents.size() > 0) {
                     EventObject event = ContactEvents.get(0);
                     InvoiceObject NewInvoice;
                     Date start = new Date(event.getBeginEvent().getDateTime().getValue());
                     //case the first event of the contact is the current month ignore
-                    if (mMonth == start.getMonth() || mYear == start.getYear()) {
+                    if (!(mMonth == start.getMonth() || mYear == start.getYear())) {
                         NewInvoice = new InvoiceObject(Contact, Contact.getAmount(), new Date());
                         NewInvoice.AddEventId(event.getId());
+                        NewInvoices.add(NewInvoice);
+
                         ContactEvents.get(0).setStatus(db.InvoicePaidCode());
                         int actualMonth = 0;
 
@@ -136,9 +138,9 @@ public abstract class InvoiceFragment extends Fragment implements AdapterView.On
                                 NewInvoice = new InvoiceObject(Contact, Contact.getAmount(), new Date());
                                 NewInvoice.AddEventId(event.getId());
 
-                                ContactEvents.get(0).setStatus(db.InvoicePaidCode());
+                                ContactEvents.get(count).setStatus(db.InvoicePaidCode());
                                 actualMonth = lastMonth;
-                            }else if (actualMonth == lastMonth) {
+                            } else if (actualMonth == lastMonth) {
                                 NewInvoice.AddEventId(event.getId());
                             }
                         }
@@ -146,8 +148,7 @@ public abstract class InvoiceFragment extends Fragment implements AdapterView.On
                 }
 
 
-            }
-            else if( Contact.getPeriod().equals( db.CHR_TYPE_WEEKLY)  ) {
+            } else if (Contact.getPeriod().equals(db.CHR_TYPE_WEEKLY)) {
                 if (ContactEvents.size() > 0) {
                     EventObject event = ContactEvents.get(0);
                     InvoiceObject NewInvoice;
@@ -172,7 +173,7 @@ public abstract class InvoiceFragment extends Fragment implements AdapterView.On
                                 lastMonth = start.getMonth();
                                 actualWeek = lastWeek;
 
-                            }else if (actualWeek == lastWeek) {
+                            } else if (actualWeek == lastWeek) {
                                 NewInvoice.AddEventId(event.getId());
                             }
 
@@ -182,8 +183,7 @@ public abstract class InvoiceFragment extends Fragment implements AdapterView.On
                     }
                 }
 
-            }
-            else if( Contact.getPeriod().equals(db.CHR_TYPE_PERCLASS) ) {
+            } else if (Contact.getPeriod().equals(db.CHR_TYPE_PERCLASS)) {
 
 
                 if (ContactEvents.size() > 0) {
@@ -193,8 +193,8 @@ public abstract class InvoiceFragment extends Fragment implements AdapterView.On
                     //case the first event of the contact is the current month ignore
                     if (mMonth != start.getMonth() || mYear != start.getYear()) {
                         NewInvoice = new InvoiceObject(Contact, Contact.getAmount(), new Date());
-                        NewInvoices.add(NewInvoice);
                         NewInvoice.AddEventId(event.getId());
+                        NewInvoices.add(NewInvoice);
                         ContactEvents.get(0).setStatus(db.InvoicePaidCode());
 
                     }
@@ -216,34 +216,34 @@ public abstract class InvoiceFragment extends Fragment implements AdapterView.On
                     }
                 }
 
-            } else if( Contact.getPeriod().equals(db.CHR_TYPE_PERHOUR) ) {
-                    if (ContactEvents.size() > 0 ) {
-                        EventObject event = ContactEvents.get(0);
-                        InvoiceObject NewInvoice;
-                        int lastMonth ;
-                        int sumHours = 0;
+            } else if (Contact.getPeriod().equals(db.CHR_TYPE_PERHOUR)) {
+                if (ContactEvents.size() > 0) {
+                    EventObject event = ContactEvents.get(0);
+                    InvoiceObject NewInvoice;
+                    int lastMonth;
+                    int sumHours = 0;
 
-                        for (int count = 0; count < ContactEvents.size(); count++) {
-                            Date start = new Date( event.getBeginEvent().getDateTime().getValue() );
-                            Date end   = new Date( event.getEndEvent().getDateTime().getValue() );
-                            long diff = end.getTime() - start.getTime();
-                            long seconds = diff / 1000;
-                            long minutes = seconds / 60;
-                            long hours = minutes / 60;
-                            //long days = hours / 24; //just for reference
+                    for (int count = 0; count < ContactEvents.size(); count++) {
+                        Date start = new Date(event.getBeginEvent().getDateTime().getValue());
+                        Date end = new Date(event.getEndEvent().getDateTime().getValue());
+                        long diff = end.getTime() - start.getTime();
+                        long seconds = diff / 1000;
+                        long minutes = seconds / 60;
+                        long hours = minutes / 60;
+                        //long days = hours / 24; //just for reference
 
-                            sumHours += hours;
-                            start = new Date( event.getBeginEvent().getDateTime().getValue() );
-                            lastMonth = start.getMonth();
-                            event = ContactEvents.get(count);
-                            if ( (lastMonth == start.getMonth() || mYear == start.getYear()) ) {
-                                NewInvoice = new InvoiceObject(Contact,Contact.getAmount() * sumHours, new Date() );
-                                NewInvoices.add(NewInvoice);
-                                ContactEvents.get(0).setStatus(db.InvoicePaidCode());
-                                sumHours = 0;
-                            }
+                        sumHours += hours;
+                        start = new Date(event.getBeginEvent().getDateTime().getValue());
+                        lastMonth = start.getMonth();
+                        event = ContactEvents.get(count);
+                        if ((lastMonth == start.getMonth() || mYear == start.getYear())) {
+                            NewInvoice = new InvoiceObject(Contact, Contact.getAmount() * sumHours, new Date());
+                            NewInvoices.add(NewInvoice);
+                            ContactEvents.get(0).setStatus(db.InvoicePaidCode());
+                            sumHours = 0;
                         }
                     }
+                }
             }
         }
 
@@ -252,52 +252,41 @@ public abstract class InvoiceFragment extends Fragment implements AdapterView.On
     }
 
     public void updateInvoiceList(final List<InvoiceObject> invoiceObjects) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (invoiceObjects == null) {
+        if (getActivity() != null) {
 
-                    Toast.makeText(
-                            getActivity(),
-                            getString(R.string.error_retrivieving),
-                            Toast.LENGTH_SHORT
-                    ).show();
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (invoiceObjects == null) {
 
-                } else if (invoiceObjects.size() == 0) {
-                    Toast.makeText(
-                            getActivity(),
-                            getString(R.string.no_events),
-                            Toast.LENGTH_SHORT
-                    ).show();
+                        Toast.makeText(
+                                getActivity(),
+                                getString(R.string.error_retrieving_invoice),
+                                Toast.LENGTH_SHORT
+                        ).show();
 
-                } else {
+                    } else if (invoiceObjects.size() == 0) {
+                        Toast.makeText(
+                                getActivity(),
+                                getString(R.string.no_new_invoices),
+                                Toast.LENGTH_SHORT
+                        ).show();
 
-                    Toast.makeText(
-                            getActivity(),
-                            getString(R.string.updated),
-                            Toast.LENGTH_SHORT
-                    ).show();
+                    } else {
 
-                    db.importInvoice(invoiceObjects);
-                    mAdapter.AddInvoice(invoiceObjects);
+                        Toast.makeText(
+                                getActivity(),
+                                getString(R.string.new_invoices),
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+                        db.importInvoice(invoiceObjects);
+                        mAdapter.AddInvoice(invoiceObjects);
+                    }
                 }
-            }
-        });
+            });
 
-
-    }
-
-    public void updateStatus(final String message) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(
-                        getActivity(),
-                        message,
-                        Toast.LENGTH_LONG
-                ).show();
-            }
-        });
+        }
     }
 
     /**

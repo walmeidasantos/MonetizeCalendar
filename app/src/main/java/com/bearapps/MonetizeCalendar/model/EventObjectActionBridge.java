@@ -1,26 +1,26 @@
-package com.bearapps.ground_control.model;
+package com.bearapps.MonetizeCalendar.model;
 
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
 
-import com.bearapps.ground_control.UI.MainActivity;
+import com.bearapps.MonetizeCalendar.UI.MainActivity;
 
 /**
  * An {@link android.app.IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
  */
 public class EventObjectActionBridge extends IntentService {
-    public final static int ACTION_OPEN_MAIN  = 5;
+    public final static int ACTION_OPEN_MAIN = 5;
     public final static String ACTION_CODE = "bearcode.actionCode";
 
     public Handler mHandler;
+    Intent intent;
+
     public EventObjectActionBridge() {
         super("EventObjectActionBridge");
     }
-
-    Intent intent;
 
     @Override
     public void onCreate() {

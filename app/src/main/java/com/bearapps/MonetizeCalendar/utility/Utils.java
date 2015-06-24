@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bearapps.ground_control.utility;
+package com.bearapps.MonetizeCalendar.utility;
 
 import android.os.Build;
 
@@ -24,9 +24,10 @@ import android.os.Build;
 public class Utils {
 
     // Prevents instantiation.
-    private Utils() {}
+    private Utils() {
+    }
 
-     /**
+    /**
      * Uses static final constants to detect if the device's platform version is Gingerbread or
      * later.
      */

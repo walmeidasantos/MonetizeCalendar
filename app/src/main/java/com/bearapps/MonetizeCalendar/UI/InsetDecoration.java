@@ -1,11 +1,11 @@
-package com.bearapps.ground_control.UI;
+package com.bearapps.MonetizeCalendar.UI;
 
 import android.content.Context;
 import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.bearapps.ground_control.R;
+import com.bearapps.MonetizeCalendar.R;
 
 /**
  * ItemDecoration implementation that applies an inset margin

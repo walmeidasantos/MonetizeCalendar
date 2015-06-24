@@ -1,4 +1,4 @@
-package com.bearapps.ground_control.model;
+package com.bearapps.MonetizeCalendar.model;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -7,8 +7,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.TextView;
 
-import com.bearapps.ground_control.R;
-import com.bearapps.ground_control.utility.MyUtil;
+import com.bearapps.MonetizeCalendar.R;
+import com.bearapps.MonetizeCalendar.utility.MyUtil;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Clip
     private boolean allowAnimate = true;
     private AdapterView.OnItemClickListener mOnItemClickListener;
 
-    public EventCardAdapter(List<EventObject> Events)  {
+    public EventCardAdapter(List<EventObject> Events) {
 
         eventObjectList = Events;
         notifyDataSetChanged();
@@ -44,16 +44,16 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Clip
     public void onBindViewHolder(final ClipCardViewHolder clipCardViewHolder, int i) {
         final EventObject eventObject = eventObjectList.get(i);
 
-        clipCardViewHolder.vDate.setText(eventObject.getBeginEventDate() );
-        clipCardViewHolder.vTime.setText(eventObject.getBeginEventTime() );
-        clipCardViewHolder.vDay.setText(eventObject.getBeginEventDate().substring(0,2) );
-        clipCardViewHolder.vContactsName.setText(eventObject.getFirstContact() );
+        clipCardViewHolder.vDate.setText(eventObject.getBeginEventDate());
+        clipCardViewHolder.vTime.setText(eventObject.getBeginEventTime());
+        clipCardViewHolder.vDay.setText(eventObject.getBeginEventDate().substring(0, 2));
+        clipCardViewHolder.vContactsName.setText(eventObject.getFirstContactEmail());
         clipCardViewHolder.vSummary.setText(MyUtil.stringLengthCut(eventObject.getSumary()));
 
     }
 
     @Override
-    public ClipCardViewHolder onCreateViewHolder( ViewGroup viewGroup, int i) {
+    public ClipCardViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View itemView = LayoutInflater.
                 from(viewGroup.getContext()).
                 inflate(R.layout.activity_main_card, viewGroup, false);
@@ -69,6 +69,10 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Clip
     public void remove(int position) {
         eventObjectList.remove(position);
         notifyItemRemoved(position);
+    }
+
+    public void setOnItemClickListener(AdapterView.OnItemClickListener onItemClickListener) {
+        mOnItemClickListener = onItemClickListener;
     }
 
     public class ClipCardViewHolder extends RecyclerView.ViewHolder {
@@ -89,11 +93,6 @@ public class EventCardAdapter extends RecyclerView.Adapter<EventCardAdapter.Clip
             vMain = v;
         }
     }
-
-    public void setOnItemClickListener(AdapterView.OnItemClickListener onItemClickListener) {
-        mOnItemClickListener = onItemClickListener;
-    }
-
 
 
 }

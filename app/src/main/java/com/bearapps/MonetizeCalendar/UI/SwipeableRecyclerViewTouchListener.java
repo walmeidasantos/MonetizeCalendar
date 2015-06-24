@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bearapps.ground_control.UI;
+package com.bearapps.MonetizeCalendar.UI;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -172,8 +172,8 @@ public class SwipeableRecyclerViewTouchListener implements RecyclerView.OnItemTo
                     mDownY = motionEvent.getRawY();
                     mDownPosition = mRecyclerView.getChildPosition(mDownView);
 //                    if (mSwipeListener.canSwipe(mDownPosition)) {
-                        mVelocityTracker = VelocityTracker.obtain();
-                        mVelocityTracker.addMovement(motionEvent);
+                    mVelocityTracker = VelocityTracker.obtain();
+                    mVelocityTracker.addMovement(motionEvent);
 //                    } else {
 //                        mDownView = null;
 //                    }
@@ -228,8 +228,8 @@ public class SwipeableRecyclerViewTouchListener implements RecyclerView.OnItemTo
                 }
                 if (
                         dismiss &&
-                        mDownPosition != ListView.INVALID_POSITION &&
-                        mSwipeListener.canSwipe(mDownPosition)
+                                mDownPosition != ListView.INVALID_POSITION &&
+                                mSwipeListener.canSwipe(mDownPosition)
                         ) {
                     // dismiss
                     final View downView = mDownView; // mDownView gets null'd before animation ends

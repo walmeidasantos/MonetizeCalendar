@@ -1,18 +1,18 @@
-package com.bearapps.ground_control.UI;
+package com.bearapps.MonetizeCalendar.UI;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.bearapps.ground_control.utility.Storage;
+import com.bearapps.MonetizeCalendar.utility.Storage;
 
-public class EditContactMainFragment extends EditContactsFragment {
+public class ContactMainFragment extends ContactsFragment {
     private Storage db;
 
 
-    public static EditContactMainFragment newInstance() {
-        EditContactMainFragment fragment = new EditContactMainFragment();
+    public static ContactMainFragment newInstance() {
+        ContactMainFragment fragment = new ContactMainFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -26,7 +26,7 @@ public class EditContactMainFragment extends EditContactsFragment {
 
     @Override
     protected RecyclerView.LayoutManager getLayoutManager() {
-        return new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+        return new GridLayoutManager(getActivity(), 4, GridLayoutManager.VERTICAL, false);
     }
 
     @Override
@@ -35,9 +35,14 @@ public class EditContactMainFragment extends EditContactsFragment {
     }
 
     @Override
-    protected EditContactAdapter getAdapter() {
+    public int getDefaultItemCount() {
+        return 40;
+    }
 
-            return new EditContactAdapter(db.getAllContacts());
+    @Override
+    protected ContactAdapter getAdapter() {
+
+        return new ContactAdapter(db.getAllContacts());
     }
 
 

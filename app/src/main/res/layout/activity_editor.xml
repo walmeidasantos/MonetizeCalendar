@@ -67,27 +67,27 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/montly"
-                    android:checked="true" />
+                    android:checked="false" />
                 <RadioButton
                     android:id="@+id/radioWeekly"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/weekly"
-                    android:checked="true"  />
+                    android:checked="false"  />
 
                 <RadioButton
                     android:id="@+id/radioPerClass"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/per_class"
-                    android:checked="true"   />
+                    android:checked="false"   />
 
                 <RadioButton
                     android:id="@+id/radioPerHour"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/per_hour"
-                    android:checked="true"
+                    android:checked="false"
                      />
 
             </RadioGroup>

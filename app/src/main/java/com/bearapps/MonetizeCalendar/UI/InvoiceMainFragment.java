@@ -1,18 +1,18 @@
-package com.bearapps.ground_control.UI;
+package com.bearapps.MonetizeCalendar.UI;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.bearapps.ground_control.utility.Storage;
+import com.bearapps.MonetizeCalendar.utility.Storage;
 
-public class ContactMainFragment extends ContactsFragment {
+public class InvoiceMainFragment extends InvoiceFragment {
     private Storage db;
 
 
-    public static ContactMainFragment newInstance() {
-        ContactMainFragment fragment = new ContactMainFragment();
+    public static InvoiceMainFragment newInstance() {
+        InvoiceMainFragment fragment = new InvoiceMainFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -26,7 +26,7 @@ public class ContactMainFragment extends ContactsFragment {
 
     @Override
     protected RecyclerView.LayoutManager getLayoutManager() {
-        return new GridLayoutManager(getActivity(), 4, GridLayoutManager.VERTICAL, false);
+        return new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
     }
 
     @Override
@@ -35,14 +35,9 @@ public class ContactMainFragment extends ContactsFragment {
     }
 
     @Override
-    public int getDefaultItemCount() {
-        return 40;
-    }
+    protected InvoiceAdapter getAdapter() {
 
-    @Override
-    protected ContactAdapter getAdapter() {
-
-            return new ContactAdapter(db.getAllContacts());
+        return new InvoiceAdapter(db.getInvoice());
     }
 
 

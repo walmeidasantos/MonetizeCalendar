@@ -1,4 +1,4 @@
-package com.bearapps.ground_control.UI;
+package com.bearapps.MonetizeCalendar.UI;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,8 +15,8 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.bearapps.ground_control.R;
-import com.bearapps.ground_control.utility.Storage;
+import com.bearapps.MonetizeCalendar.R;
+import com.bearapps.MonetizeCalendar.utility.Storage;
 
 
 public class ActivityEditor extends ActionBarActivity {
@@ -49,25 +49,40 @@ public class ActivityEditor extends ActionBarActivity {
         radio_perclass = (RadioButton) findViewById(R.id.radioPerClass);
         radio_perhour = (RadioButton) findViewById(R.id.radioPerHour);
 
+        radio_Monthly.setId(0);
+        radio_Weekly.setId(1);
+        radio_perclass.setId(2);
+        radio_perhour.setId(3);
+
+
         IdContact = intent.getStringExtra("id");
-        amount = Long.parseLong( intent.getStringExtra("amount") ) ;
+        amount = Long.parseLong(intent.getStringExtra("amount"));
         TextPeriod = intent.getStringExtra("period");
 
-        if (TextPeriod.equals(radio_Monthly.getText()) ) {
+        if (TextPeriod.equals(radio_Monthly.getText())) {
             radio_Monthly.setChecked(true);
+        } else {
+            radio_Monthly.setChecked(false);
         }
 
-        if (TextPeriod.equals(radio_Weekly.getText()) ) {
+        if (TextPeriod.equals(radio_Weekly.getText())) {
             radio_Weekly.setChecked(true);
+        } else {
+            radio_Weekly.setChecked(false);
         }
 
-        if (TextPeriod.equals(radio_perclass.getText()) ) {
+        if (TextPeriod.equals(radio_perclass.getText())) {
             radio_perclass.setChecked(true);
+        } else {
+            radio_perclass.setChecked(false);
         }
 
-        if (TextPeriod.equals(radio_perhour.getText()) ) {
+        if (TextPeriod.equals(radio_perhour.getText())) {
             radio_perhour.setChecked(true);
+        } else {
+            radio_perhour.setChecked(false);
         }
+
 
         TextAmount = (EditText) findViewById(R.id.amount);
         mFAB = (ImageButton) findViewById(R.id.main_fab);
@@ -95,9 +110,6 @@ public class ActivityEditor extends ActionBarActivity {
         db = Storage.getInstance(this);
 
     }
-
-
-
 
 
     @Override
@@ -130,16 +142,16 @@ public class ActivityEditor extends ActionBarActivity {
         finishAndRemoveTaskWithToast(getString(R.string.toast_no_saved));
     }
 
-    private void saveText() {
+    private void saveContact() {
         String newText = TextAmount.getText().toString();
         String toastMessage;
 
-        if (period.getCheckedRadioButtonId() == -1 ) {
+        if (period.getCheckedRadioButtonId() == -1) {
 
-        }else {
+        } else {
             int selectedId = period.getCheckedRadioButtonId();
             // find the radiobutton by returned id
-            RadioButton selectedRadioButton = (RadioButton)findViewById(selectedId);
+            RadioButton selectedRadioButton = (RadioButton) findViewById(selectedId);
             if (selectedRadioButton.getId() == 0) {
                 TextPeriod = Storage.CHR_TYPE_MONTHLY;
             } else if (selectedRadioButton.getId() == 1) {
@@ -150,14 +162,14 @@ public class ActivityEditor extends ActionBarActivity {
                 TextPeriod = Storage.CHR_TYPE_PERHOUR;
             }
         }
-        amount = Long.parseLong(TextAmount.getText().toString()) ;
-        db.modifyContact(IdContact,TextPeriod,amount);
+        amount = Long.parseLong(TextAmount.getText().toString());
+        db.modifyContact(IdContact, TextPeriod, amount);
         toastMessage = getString(R.string.action_save, newText + "\n");
         finishAndRemoveTaskWithToast(toastMessage);
     }
 
     public void saveTextOnClick(View view) {
-        saveText();
+        saveContact();
     }
 
 

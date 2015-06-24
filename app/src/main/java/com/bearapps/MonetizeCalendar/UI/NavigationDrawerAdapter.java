@@ -1,4 +1,4 @@
-package com.bearapps.ground_control.UI;
+package com.bearapps.MonetizeCalendar.UI;
 
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
@@ -8,12 +8,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.bearapps.ground_control.R;
+import com.bearapps.MonetizeCalendar.R;
 
 import java.util.List;
 
 /**
- * Created by poliveira on 24/10/2014.
+ * Created by ursow on 24/04/2015.
  */
 public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDrawerAdapter.ViewHolder> {
 

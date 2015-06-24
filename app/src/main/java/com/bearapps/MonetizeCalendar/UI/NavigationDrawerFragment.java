@@ -1,7 +1,8 @@
-package com.bearapps.ground_control.UI;
+package com.bearapps.MonetizeCalendar.UI;
 
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -17,8 +18,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
-import com.bearapps.ground_control.R;
+import com.bearapps.MonetizeCalendar.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,24 +42,23 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
      * expands it. This shared preference tracks this.
      */
     private static final String PREF_USER_LEARNED_DRAWER = "navigation_drawer_learned";
-
+    SharedPreferences settings;
     /**
      * A pointer to the current callbacks instance (the Activity).
      */
     private NavigationDrawerCallbacks mCallbacks;
-
     /**
      * Helper component that ties the action bar to the navigation drawer_layout.
      */
     private ActionBarDrawerToggle mDrawerToggle;
-
     private DrawerLayout mDrawerLayout;
     private RecyclerView mDrawerList;
     private View mFragmentContainerView;
-
+    private TextView AccountName;
     private int mCurrentSelectedPosition = 0;
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
+
 
     public NavigationDrawerFragment() {
     }
@@ -81,7 +82,7 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
     }
 
     @Override
-    public void onActivityCreated (Bundle savedInstanceState) {
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         // Indicate that this fragment would like to influence the set of actions in the action bar.
         setHasOptionsMenu(true);
@@ -89,9 +90,10 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_navigation_google, container, false);
         mDrawerList = (RecyclerView) view.findViewById(R.id.drawerList);
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
@@ -99,7 +101,15 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
         mDrawerList.setFitsSystemWindows(true);
         mDrawerList.setHasFixedSize(true);
 
+        AccountName = (TextView) view.findViewById(R.id.txtUserEmail);
+        settings = getActivity().getPreferences(Context.MODE_PRIVATE);
+
+        AccountName.setText(settings.getString(EventsFragment.PREF_ACCOUNT_NAME, null));
+
+
         final List<NavigationItem> navigationItems = getMenu();
+        final List<NavigationItem> navigationBottonItems = getMenuBotton();
+
         NavigationDrawerAdapter adapter = new NavigationDrawerAdapter(navigationItems);
         adapter.setNavigationDrawerCallbacks(this);
         mDrawerList.setAdapter(adapter);
@@ -117,20 +127,28 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
         return items;
     }
 
+    public List<NavigationItem> getMenuBotton() {
+        List<NavigationItem> items = new ArrayList<NavigationItem>();
+        items.add(new NavigationItem(getActivity().getString(R.string.help_contact), getResources().getDrawable(R.drawable.ic_menu_check)));
+        return items;
+    }
+
+
     public boolean isDrawerOpen() {
         return mDrawerLayout != null && mDrawerLayout.isDrawerOpen(mFragmentContainerView);
     }
 
     /**
      * Users of this fragment must call this method to set up the navigation drawer_layout interactions.
-     *  @param fragmentId   The android:id of this fragment in its activity's layout.
+     *
+     * @param fragmentId   The android:id of this fragment in its activity's layout.
      * @param drawerLayout The DrawerLayout containing this fragment's UI.
      * @param toolbar
      */
     public void setUp(int fragmentId, DrawerLayout drawerLayout, Toolbar toolbar) {
         mFragmentContainerView = getActivity().findViewById(fragmentId);
 
-        if(mFragmentContainerView.getParent() instanceof ScrimInsetsFrameLayout){
+        if (mFragmentContainerView.getParent() instanceof ScrimInsetsFrameLayout) {
             mFragmentContainerView = (View) mFragmentContainerView.getParent();
         }
         mDrawerLayout = drawerLayout;
@@ -140,7 +158,7 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
         // set up the drawer_layout's list view with items and click listener
 
         // ActionBarDrawerToggle ties together the the proper interactions
-        // between the navigation drawer_layout and the action bar app icon.
+        // between the navigation drawer_layout and the action bar app bearapps.
         mDrawerToggle = new ActionBarDrawerToggle(
                 getActivity(),                    /* host Activity */
                 mDrawerLayout,                                  /* DrawerLayout object */
@@ -251,4 +269,4 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
         selectItem(position);
     }
 
- }
+}
