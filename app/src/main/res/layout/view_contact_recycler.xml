@@ -4,8 +4,8 @@
     android:id="@+id/contact_list"
     android:scrollbars="vertical"
     android:theme="@style/AppTheme"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:background="@color/myDrawerBackground"
     />
 

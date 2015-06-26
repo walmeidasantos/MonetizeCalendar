@@ -62,7 +62,7 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
     public static final int REQUEST_AUTHORIZATION = 1001;
     public static final String PREF_ACCOUNT_NAME = "APP_DEFAULT_ACCOUNT";
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
-    private static final String SYNC_TOKEN_CALENDAR = "SYNC_TOKEN";
+    public static final String SYNC_TOKEN_CALENDAR = "SYNC_TOKEN";
     private static final String[] SCOPES = {CalendarScopes.CALENDAR_READONLY};
     final HttpTransport transport = AndroidHttp.newCompatibleTransport();
     final JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
@@ -523,8 +523,7 @@ public abstract class EventsFragment extends Fragment implements AdapterView.OnI
             List<EventObject> eventsObject = new ArrayList<>();
             Events events;
             String token = settings.getString(SYNC_TOKEN_CALENDAR, null);
-            token = null;
-
+            token = null; //while resolve the problem with the new contacts and sync the pass
             if (token != null) {
                 mService.events().list("primary");
                 events = mService.events().list("primary").setAlwaysIncludeEmail(true).setMaxResults(2500).setSyncToken(token).execute();

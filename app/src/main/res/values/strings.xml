@@ -136,7 +136,7 @@
     <string name="account_choosed">Account choosed:</string>
     <string name="help_contact"><![CDATA[Help & Contact]]></string>
     <string name="wait_contacts">Wait here while reading your contacts.</string>
-    <string name="contacts_arrived">Your contacts has arrived</string>
+    <string name="contacts_arrived">Your contacts arrived</string>
     <string name="no_contacts">No new contacts</string>
     <string name="error_retrieving_contacts">Error retrieving your contacts</string>
 

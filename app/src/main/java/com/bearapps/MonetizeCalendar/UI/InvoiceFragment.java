@@ -96,7 +96,7 @@ public abstract class InvoiceFragment extends Fragment implements AdapterView.On
     @Override
     public void onResume() {
         super.onResume();
-        mAdapter.AddInvoice(db.getInvoice());
+        mAdapter.AddInvoice(db.getInvoices());
     }
 
     private List<InvoiceObject> generateInvoice() {
@@ -281,7 +281,8 @@ public abstract class InvoiceFragment extends Fragment implements AdapterView.On
                         ).show();
 
                         db.importInvoice(invoiceObjects);
-                        mAdapter.AddInvoice(invoiceObjects);
+
+                        mAdapter.AddInvoice(db.getInvoices());
                     }
                 }
             });

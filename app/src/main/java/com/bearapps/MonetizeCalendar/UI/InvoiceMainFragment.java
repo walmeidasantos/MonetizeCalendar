@@ -37,7 +37,7 @@ public class InvoiceMainFragment extends InvoiceFragment {
     @Override
     protected InvoiceAdapter getAdapter() {
 
-        return new InvoiceAdapter(db.getInvoice());
+        return new InvoiceAdapter(db.getInvoices());
     }
 
 

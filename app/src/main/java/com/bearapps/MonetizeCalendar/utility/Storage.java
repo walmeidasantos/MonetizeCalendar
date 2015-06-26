@@ -378,6 +378,7 @@ public class Storage {
                 null,//having
                 null);//orderby
 
+        cursor_Contacts.moveToFirst();
 
         ContactObject contact = new ContactObject(
                 cursor_Contacts.getString(0), //googleId
@@ -585,7 +586,7 @@ public class Storage {
 
     }
 
-    public List<InvoiceObject> getInvoice() {
+    public List<InvoiceObject> getInvoices() {
         List<InvoiceObject> invoices = new ArrayList<>();
         String[] whereParam = new String[]{String.valueOf(INVOICE_OPEN)};
         String whereClause = INVOICE_STATUS + " = ? ";
@@ -625,7 +626,7 @@ public class Storage {
             close();
             isInvoiceInMemoryChanged = false;
         }
-        return invoices;
+        return InvoiceInMemory;
     }
 
 
@@ -656,7 +657,7 @@ public class Storage {
             if (!error) {
                 for (Integer event : eventsId) {
                     InvoicexEventsValues.put(INVOICEXEVENTS_EVENTID, event);
-                    InvoicexEventsValues.put(INVOICEXEVENTS_ID, invoice.getId());
+                    InvoicexEventsValues.put(INVOICEXEVENTS_INVOICEID, invoice.getId());
                     row_id = db.insert(TABLE_INVOICEXEVENTS, null, InvoicexEventsValues);
                 }
                 if (row_id == -1) {

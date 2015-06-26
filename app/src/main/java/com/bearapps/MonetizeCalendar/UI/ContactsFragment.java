@@ -2,6 +2,7 @@ package com.bearapps.MonetizeCalendar.UI;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -40,6 +41,8 @@ public abstract class ContactsFragment extends Fragment implements AdapterView.O
     private Storage db;
     private Context context;
     private String TAG = "MonetizeCalendar";
+    SharedPreferences settings;
+
 
     /**
      * Required Overrides for Sample Fragments
@@ -260,6 +263,10 @@ public abstract class ContactsFragment extends Fragment implements AdapterView.O
                         clipCardViewHolder.vCheckUser.setVisibility(View.INVISIBLE);
                         contactObject.setUnChoosed();
                         db.InactiveContact(contactObject.getGoogleId());
+
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putString(EventsFragment.SYNC_TOKEN_CALENDAR, null);
+                        editor.commit();
 
                     } else {
                         db.addContact(contactObject);
