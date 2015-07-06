@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.bearapps.MonetizeCalendar.model.EventCardAdapter;
+import com.bearapps.MonetizeCalendar.Materials.EventCardAdapter;
 import com.bearapps.MonetizeCalendar.utility.Storage;
 
 public class EventMainFragment extends EventsFragment {

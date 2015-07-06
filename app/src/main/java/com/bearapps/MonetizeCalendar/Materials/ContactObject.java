@@ -1,4 +1,6 @@
-package com.bearapps.MonetizeCalendar.model;
+package com.bearapps.MonetizeCalendar.Materials;
+
+import android.net.Uri;
 
 import com.bearapps.MonetizeCalendar.utility.Storage;
 
@@ -12,13 +14,21 @@ public class ContactObject {
     protected String name;
     protected String email;
     protected String status;
-    protected String photoPath;
+    protected Uri photoPath;
     protected Boolean choosed = false;
     protected long amount = 0;
     protected String period;
     protected Boolean stored = false;
 
-    public ContactObject(String googleid, String name, String email, String Status, String photoPath) {
+    public ContactObject(String googleid, String name, String email, String Status, long amount, String period) {
+        this.googleidId = googleid;
+        this.name = name;
+        this.email = email;
+        this.status = Status;
+
+    }
+
+    public ContactObject(String googleid, String name, String email, String Status, Uri photoPath) {
         this.googleidId = googleid;
         this.name = name;
         this.email = email;
@@ -26,8 +36,7 @@ public class ContactObject {
         this.photoPath = photoPath;
 
     }
-
-    public ContactObject(String googleid, String name, String email, String Status, String photoPath, long amount, String period) {
+    public ContactObject(String googleid, String name, String email, String Status, Uri photoPath, long amount, String period) {
         this.googleidId = googleid;
         this.name = name;
         this.email = email;
@@ -62,7 +71,7 @@ public class ContactObject {
         return email;
     }
 
-    public String getPhotoPath() {
+    public Uri getPhotoPath() {
         return photoPath;
     }
 
@@ -95,6 +104,11 @@ public class ContactObject {
 
     public Boolean StatusStore() {
         return this.stored;
+    }
+
+    public Uri LoadPhoto(Long id) {
+
+        return photoPath;
     }
 
     public void ToggleStore() {

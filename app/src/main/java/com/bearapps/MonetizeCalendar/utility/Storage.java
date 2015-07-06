@@ -7,9 +7,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.bearapps.MonetizeCalendar.model.ContactObject;
-import com.bearapps.MonetizeCalendar.model.EventObject;
-import com.bearapps.MonetizeCalendar.model.InvoiceObject;
+import com.bearapps.MonetizeCalendar.Materials.ContactObject;
+import com.bearapps.MonetizeCalendar.Materials.EventObject;
+import com.bearapps.MonetizeCalendar.Materials.InvoiceObject;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.EventDateTime;
 
@@ -385,7 +385,6 @@ public class Storage {
                 cursor_Contacts.getString(1), //name
                 cursor_Contacts.getString(2), //email
                 null,//left disable the status
-                cursor_Contacts.getString(4), //photoPath
                 cursor_Contacts.getLong(6), //amount
                 cursor_Contacts.getString(5)//period
         );
@@ -455,7 +454,6 @@ public class Storage {
                                 cursor_Contacts.getString(1), //name
                                 cursor_Contacts.getString(2), //email
                                 null,//left disable the status
-                                cursor_Contacts.getString(4), //photoPath
                                 cursor_Contacts.getLong(6), //amount
                                 cursor_Contacts.getString(5)//period
                         )
@@ -505,7 +503,6 @@ public class Storage {
                                 cursor_Contacts.getString(1), //name
                                 cursor_Contacts.getString(2), //email
                                 null,//left disable the status
-                                cursor_Contacts.getString(4), //photoPath
                                 cursor_Contacts.getLong(6), //amount
                                 cursor_Contacts.getString(5)//period
                         )

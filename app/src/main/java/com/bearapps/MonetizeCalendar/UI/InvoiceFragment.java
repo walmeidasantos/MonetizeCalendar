@@ -1,7 +1,6 @@
 package com.bearapps.MonetizeCalendar.UI;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,10 +16,10 @@ import android.widget.QuickContactBadge;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bearapps.MonetizeCalendar.Materials.ContactObject;
+import com.bearapps.MonetizeCalendar.Materials.EventObject;
+import com.bearapps.MonetizeCalendar.Materials.InvoiceObject;
 import com.bearapps.MonetizeCalendar.R;
-import com.bearapps.MonetizeCalendar.model.ContactObject;
-import com.bearapps.MonetizeCalendar.model.EventObject;
-import com.bearapps.MonetizeCalendar.model.InvoiceObject;
 import com.bearapps.MonetizeCalendar.utility.Storage;
 
 import java.util.ArrayList;
@@ -319,7 +318,7 @@ public abstract class InvoiceFragment extends Fragment implements AdapterView.On
             if (invoiceObject.getContact().getPhotoPath() == null) {
                 clipCardViewHolder.vBagde.setImageResource(R.drawable.avatar_empty);
             } else {
-                clipCardViewHolder.vBagde.setImageURI(Uri.parse(invoiceObject.getContact().getPhotoPath()));
+                clipCardViewHolder.vBagde.setImageURI(invoiceObject.getContact().getPhotoPath());
             }
             clipCardViewHolder.vInvoiceValue.setText(String.valueOf(invoiceObject.getAmount()));
             clipCardViewHolder.vInvoiceNumber.setText(String.valueOf(invoiceObject.getAmount()));

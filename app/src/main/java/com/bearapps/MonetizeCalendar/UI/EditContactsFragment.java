@@ -2,7 +2,6 @@ package com.bearapps.MonetizeCalendar.UI;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
@@ -17,8 +16,8 @@ import android.widget.QuickContactBadge;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bearapps.MonetizeCalendar.Materials.ContactObject;
 import com.bearapps.MonetizeCalendar.R;
-import com.bearapps.MonetizeCalendar.model.ContactObject;
 import com.bearapps.MonetizeCalendar.utility.Storage;
 
 import java.util.List;
@@ -123,7 +122,7 @@ public abstract class EditContactsFragment extends Fragment implements AdapterVi
             if (contactObject.getPhotoPath() == null) {
                 clipCardViewHolder.vBagde.setImageResource(R.drawable.avatar_empty);
             } else {
-                clipCardViewHolder.vBagde.setImageURI(Uri.parse(contactObject.getPhotoPath()));
+                clipCardViewHolder.vBagde.setImageURI(contactObject.getPhotoPath());
             }
             clipCardViewHolder.vAmount.setText(String.valueOf(contactObject.getAmount()));
             clipCardViewHolder.vPeriod.setText(contactObject.getPeriod());

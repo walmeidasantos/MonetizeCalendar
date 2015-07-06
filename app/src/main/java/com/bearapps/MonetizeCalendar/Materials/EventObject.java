@@ -1,4 +1,4 @@
-package com.bearapps.MonetizeCalendar.model;
+package com.bearapps.MonetizeCalendar.Materials;
 
 import com.google.api.services.calendar.model.EventDateTime;
 

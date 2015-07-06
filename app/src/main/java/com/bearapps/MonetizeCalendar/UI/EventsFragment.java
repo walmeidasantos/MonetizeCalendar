@@ -21,9 +21,9 @@ import android.widget.AdapterView;
 import android.widget.Toast;
 
 import com.bearapps.MonetizeCalendar.R;
-import com.bearapps.MonetizeCalendar.model.ContactObject;
-import com.bearapps.MonetizeCalendar.model.EventCardAdapter;
-import com.bearapps.MonetizeCalendar.model.EventObject;
+import com.bearapps.MonetizeCalendar.Materials.ContactObject;
+import com.bearapps.MonetizeCalendar.Materials.EventCardAdapter;
+import com.bearapps.MonetizeCalendar.Materials.EventObject;
 import com.bearapps.MonetizeCalendar.utility.Storage;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;

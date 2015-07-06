@@ -1,4 +1,4 @@
-package com.bearapps.MonetizeCalendar.model;
+package com.bearapps.MonetizeCalendar.Materials;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
