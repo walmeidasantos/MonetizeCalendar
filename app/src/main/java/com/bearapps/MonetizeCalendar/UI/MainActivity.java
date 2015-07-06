@@ -27,6 +27,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
     private CharSequence mTitle;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,6 +97,8 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
 
         ft.commit();
     }
+
+
 
     @Override
     protected void onNewIntent(Intent intent) {
