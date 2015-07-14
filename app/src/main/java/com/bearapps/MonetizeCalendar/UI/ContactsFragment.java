@@ -1,7 +1,6 @@
 package com.bearapps.MonetizeCalendar.UI;
 
 import android.app.Activity;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -197,6 +196,7 @@ public abstract class ContactsFragment extends Fragment implements AdapterView.O
     private void refreshContactList() {
 
         getActivity().setProgressBarIndeterminateVisibility(true);
+
         Toast.makeText(getActivity(),
                 context.getString(R.string.wait_contacts),
                 Toast.LENGTH_SHORT).show();
@@ -371,7 +371,7 @@ public abstract class ContactsFragment extends Fragment implements AdapterView.O
                 Cursor contactsCursor = mActivity.getContentResolver().query(contactsUri, null, null, null,
                         ContactsContract.CommonDataKinds.Email.DISPLAY_NAME + " ASC ");
 
-                if (contactsCursor.moveToFirst()) {
+                if (contactsCursor != null && contactsCursor.moveToFirst()) {
                     do {
                         long contactId = contactsCursor.getLong(contactsCursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.CONTACT_ID));
 
@@ -390,7 +390,7 @@ public abstract class ContactsFragment extends Fragment implements AdapterView.O
                         String Id = String.valueOf(contactId);
                         // Getting Photo
 
-                        try {
+                        /*try {
                             Cursor cur = mActivity.getContentResolver().query(
                                     ContactsContract.Data.CONTENT_URI,
                                     null,
@@ -409,7 +409,8 @@ public abstract class ContactsFragment extends Fragment implements AdapterView.O
                             e.printStackTrace();
                             return null;
                         }
-                        Uri photoUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId);
+                        Uri photoUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId);*/
+                        Uri photoUri = null;
 
 
                         Contacts.add(
@@ -418,7 +419,8 @@ public abstract class ContactsFragment extends Fragment implements AdapterView.O
                                         displayName,
                                         homeEmail,
                                         null,
-                                        Uri.withAppendedPath(photoUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY)
+                                        null
+                                        //Uri.withAppendedPath(photoUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY)
                                 )
                         );
 
